@@ -16,38 +16,53 @@ var (
 )
 
 func NewRandomise() Random {
-	typeProviders := make(map[string]Provider)
+	configs := make(map[string]Config)
+	defaultConfig := Config{
+		Provider:     nil,
+		MapKeyLength: 3,
+		StringLength: 1,
+		SliceLength:  1,
+		MapLength:    1,
+	}
 	return Random{
 		seed:           nil,
-		stringLength:   1,
-		sliceLength:    1,
-		mapLength:      1,
-		typeProviders:  typeProviders,
+		configs:        configs,
+		currentConfig:  nil,
+		defaultConfig:  &defaultConfig,
 		createdWithNew: true,
-		mapKeyLength:   3,
 	}
+}
+
+type Config struct {
+	Provider     Provider
+	MapKeyLength int
+	StringLength int
+	SliceLength  int
+	MapLength    int
 }
 
 type Random struct {
 	seed           *seed
-	stringLength   int // length of strings generated
-	sliceLength    int
-	mapLength      int
-	typeProviders  map[string]Provider
+	configs        map[string]Config
+	currentConfig  *Config
+	defaultConfig  *Config
 	createdWithNew bool
-	mapKeyLength   int
 }
 
 func (r *Random) SetStringLength(length int) {
-	r.stringLength = length
+	r.defaultConfig.StringLength = length
 }
 
 func (r *Random) SetSliceLength(length int) {
-	r.sliceLength = length
+	r.defaultConfig.SliceLength = length
 }
 
 func (r *Random) SetMapLength(length int) {
-	r.sliceLength = length
+	r.defaultConfig.SliceLength = length
+}
+
+func (r *Random) SetMapKeyLength(length int) {
+	r.defaultConfig.MapKeyLength = length
 }
 
 func (r *Random) SetSeed(s int64) {
@@ -56,12 +71,8 @@ func (r *Random) SetSeed(s int64) {
 	r.seed = &newSeed
 }
 
-func (r *Random) SetMapKeyLength(length int) {
-	r.mapKeyLength = length
-}
-
-func (r *Random) AddTypeProvider(name string, provider Provider) {
-	r.typeProviders[name] = provider
+func (r *Random) AddTypeConfig(name string, config Config) {
+	r.configs[name] = config
 }
 
 type seed int64
@@ -70,7 +81,7 @@ func (s *seed) nextInt() int64 {
 	return atomic.AddInt64((*int64)(s), 1)
 }
 
-func (r Random) Struct(dst interface{}) error {
+func (r *Random) Struct(dst interface{}) error {
 	if !r.createdWithNew {
 		return MalformedRandom{reason: reasonMalformedNoCreatedWithNew}
 	}
@@ -92,11 +103,15 @@ func (r Random) Struct(dst interface{}) error {
 	for i := 0; i < nFields; i++ {
 		fieldVal := value.Field(i)
 		fieldTyp := typ.Field(i)
-		if random, ok := r.typeProviders[fieldTyp.Name]; ok {
-			if err := random(fieldVal, fieldTyp.Type, fieldTyp.Name); err != nil {
-				return err
+		r.currentConfig = r.defaultConfig
+		if config, ok := r.configs[fieldTyp.Name]; ok {
+			if config.Provider != nil {
+				if err := config.Provider(fieldVal, fieldTyp.Type, fieldTyp.Name); err != nil {
+					return err
+				}
+				continue
 			}
-			continue
+			r.currentConfig = &config
 		}
 		if err := r.randomiseField(fieldVal, fieldTyp.Type, nil); err != nil {
 			return err
@@ -105,7 +120,7 @@ func (r Random) Struct(dst interface{}) error {
 	return nil
 }
 
-func (r Random) randomiseField(value reflect.Value, typ reflect.Type, keyLength *int) error {
+func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *int) error {
 	switch value.Interface().(type) {
 	case int8, *int8:
 		r.randomiseInt8(value, typ)
@@ -134,7 +149,11 @@ func (r Random) randomiseField(value reflect.Value, typ reflect.Type, keyLength 
 	case bool, *bool:
 		randomiseBool(value, typ)
 	case string, *string:
-		r.randomiseString(value, typ, keyLength)
+		l := r.currentConfig.StringLength
+		if length != nil {
+			l = *length
+		}
+		r.randomiseString(value, typ, l)
 	case time.Time, *time.Time:
 		_ = r.randomiseTime(value, typ)
 	default:
@@ -145,14 +164,14 @@ func (r Random) randomiseField(value reflect.Value, typ reflect.Type, keyLength 
 		if ignoreRegex.MatchString(typ.String()) {
 			return nil
 		}
-		if err := r.randomiseCustomField(value, kind, typ, keyLength); err != nil {
+		if err := r.randomiseCustomField(value, kind, typ, length); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (r Random) randomiseCustomField(value reflect.Value, kind reflect.Kind, typ reflect.Type, keyLength *int) error {
+func (r Random) randomiseCustomField(value reflect.Value, kind reflect.Kind, typ reflect.Type, length *int) error {
 	switch kind {
 	case reflect.Int8:
 		r.randomiseInt8(value, typ)
@@ -181,7 +200,11 @@ func (r Random) randomiseCustomField(value reflect.Value, kind reflect.Kind, typ
 	case reflect.Bool:
 		randomiseBool(value, typ)
 	case reflect.String:
-		r.randomiseString(value, typ, keyLength)
+		l := r.currentConfig.StringLength
+		if length != nil {
+			l = *length
+		}
+		r.randomiseString(value, typ, l)
 	case reflect.Struct:
 		err := r.randomiseTime(value, typ)
 		if err != nil {
@@ -199,7 +222,7 @@ func (r Random) randomiseCustomField(value reflect.Value, kind reflect.Kind, typ
 			value.Set(v)
 		}
 	case reflect.Slice:
-		return r.randomiseSlice(value, typ, keyLength)
+		return r.randomiseSlice(value, typ)
 	case reflect.Map:
 		return r.randomiseMap(value, typ)
 	case reflect.Array:
@@ -433,20 +456,17 @@ func randomiseBool(value reflect.Value, typ reflect.Type) {
 
 const alphabetAll = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func (r Random) randomString(length *int) string {
-	if length == nil {
-		length = &r.stringLength
-	}
+func (r Random) randomString(length int) string {
 	str := bytes.Buffer{}
-	str.Grow(*length)
-	for i := 0; i < *length; i++ {
+	str.Grow(length)
+	for i := 0; i < length; i++ {
 		str.WriteByte(alphabetAll[r.seed.nextInt()%int64(len(alphabetAll))])
 	}
 	return str.String()
 }
 
-func (r Random) randomiseString(value reflect.Value, typ reflect.Type, keyLength *int) {
-	v := r.randomString(keyLength)
+func (r Random) randomiseString(value reflect.Value, typ reflect.Type, length int) {
+	v := r.randomString(length)
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -490,16 +510,14 @@ func (r Random) randomiseTime(value reflect.Value, typ reflect.Type) (err error)
 	return
 }
 
-func (r Random) randomiseSlice(value reflect.Value, typ reflect.Type, length *int) error {
-	if length == nil {
-		length = &r.sliceLength
-	}
+func (r Random) randomiseSlice(value reflect.Value, typ reflect.Type) error {
 	baseType := typ
 	if typ.Kind() == reflect.Ptr {
 		baseType = baseType.Elem()
 	}
-	newSlice := reflect.MakeSlice(baseType, *length, *length)
-	for i := 0; i < *length; i++ {
+	length := r.currentConfig.SliceLength
+	newSlice := reflect.MakeSlice(baseType, length, length)
+	for i := 0; i < length; i++ {
 		v := reflect.New(baseType.Elem()).Elem()
 		if err := r.randomiseField(v, v.Type(), nil); err != nil {
 			return err
@@ -522,10 +540,10 @@ func (r Random) randomiseMap(value reflect.Value, typ reflect.Type) error {
 	}
 	mapType := reflect.MapOf(baseType.Key(), baseType.Elem())
 	newMap := reflect.MakeMap(mapType)
-	for i := 0; i < r.mapLength; i++ {
+	for i := 0; i < r.currentConfig.MapLength; i++ {
 		k := reflect.New(baseType.Key()).Elem()
 		v := reflect.New(baseType.Elem()).Elem()
-		if err := r.randomiseField(k, k.Type(), &r.mapKeyLength); err != nil {
+		if err := r.randomiseField(k, k.Type(), &r.currentConfig.MapKeyLength); err != nil {
 			return err
 		}
 		if err := r.randomiseField(v, v.Type(), nil); err != nil {

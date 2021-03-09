@@ -29,6 +29,11 @@ type CustomStringType string
 type CustomTimeType time.Time
 type CustomSliceStringType []string
 
+func (t CustomTimeType) String() string {
+	ts := time.Time(t)
+	return ts.Format(time.RFC3339)
+}
+
 const (
 	TestTypeEnumValueA TestTypeEnum = "value_a"
 	TestTypeEnumValueB TestTypeEnum = "value_b"
@@ -47,7 +52,7 @@ type StructC struct {
 	ColDeepNest int
 }
 
-type Test struct {
+type BaseTypes struct {
 	ColInt                         int
 	ColInt8                        int8
 	ColInt16                       int16
@@ -63,22 +68,6 @@ type Test struct {
 	ColBool                        bool
 	ColString                      string
 	ColTime                        time.Time
-	ColTestTypeEnum                TestTypeEnum
-	ColCustomIntType               CustomIntType
-	ColCustomInt8Type              CustomInt8Type
-	ColCustomInt16Type             CustomInt16Type
-	ColCustomInt32Type             CustomInt32Type
-	ColCustomInt64Type             CustomInt64Type
-	ColCustomFloat32Type           CustomFloat32Type
-	ColCustomFloat64Type           CustomFloat64Type
-	ColCustomUintType              CustomUintType
-	ColCustomUint8Type             CustomUint8Type
-	ColCustomUint16Type            CustomUint16Type
-	ColCustomUint32Type            CustomUint32Type
-	ColCustomUint64Type            CustomUint64Type
-	ColCustomBoolType              CustomBoolType
-	ColCustomStringType            CustomStringType
-	ColCustomTimeType              CustomTimeType
 	ColByte                        []byte
 	ColSliceInt                    []int
 	ColSliceInt8                   []int8
@@ -124,8 +113,6 @@ type Test struct {
 	ColMapStringPtrMapStringString map[string]*map[string]string
 	ColSliceSliceString            [][]string
 	ColSliceSlicePtrString         [][]*string
-	ColProviderOneOfString         string
-	ColProviderOneOfSliceTime      []time.Time
 	ColInterface                   interface{}
 	ColSliceInterface              []interface{}
 	ColMapStringInterface          map[string]interface{}
@@ -133,11 +120,9 @@ type Test struct {
 	ColArrayArrayInt8Ptr           [2]*[2]*int8
 	ColChanString                  chan string
 	ColSliceChanString             []chan string
-	ColSliceCustomBool             []CustomBoolType
-	ColCustomSliceStringType       CustomSliceStringType
 }
 
-type TestPtr struct {
+type BaseTypesPtr struct {
 	ColInt                         *int
 	ColInt8                        *int8
 	ColInt16                       *int16
@@ -153,22 +138,6 @@ type TestPtr struct {
 	ColBool                        *bool
 	ColString                      *string
 	ColTime                        *time.Time
-	ColTestTypeEnum                *TestTypeEnum
-	ColCustomIntType               *CustomIntType
-	ColCustomInt8Type              *CustomInt8Type
-	ColCustomInt16Type             *CustomInt16Type
-	ColCustomInt32Type             *CustomInt32Type
-	ColCustomInt64Type             *CustomInt64Type
-	ColCustomFloat32Type           *CustomFloat32Type
-	ColCustomFloat64Type           *CustomFloat64Type
-	ColCustomUintType              *CustomUintType
-	ColCustomUint8Type             *CustomUint8Type
-	ColCustomUint16Type            *CustomUint16Type
-	ColCustomUint32Type            *CustomUint32Type
-	ColCustomUint64Type            *CustomUint64Type
-	ColCustomBoolType              *CustomBoolType
-	ColCustomStringType            *CustomStringType
-	ColCustomTimeType              *CustomTimeType
 	ColByte                        *[]byte
 	ColSliceInt                    *[]int
 	ColSliceInt8                   *[]int8
@@ -214,8 +183,6 @@ type TestPtr struct {
 	ColMapStringPtrMapStringString *map[string]*map[string]string
 	ColSliceSliceString            *[][]string
 	ColSliceSlicePtrString         *[][]*string
-	ColProviderOneOfString         *string
-	ColProviderOneOfSliceTime      *[]time.Time
 	ColInterface                   *interface{}
 	ColSliceInterface              *[]interface{}
 	ColMapStringInterface          *map[string]interface{}
@@ -223,8 +190,46 @@ type TestPtr struct {
 	ColArrayArrayInt8Ptr           *[2]*[2]*int8
 	ColChanString                  *chan string
 	ColSliceChanString             *[]chan string
-	ColSliceCustomBool             *[]CustomBoolType
-	ColCustomSliceStringType       *CustomSliceStringType
+}
+
+type CustomTypes struct {
+	ColCustomIntType         CustomIntType
+	ColCustomInt8Type        CustomInt8Type
+	ColCustomInt16Type       CustomInt16Type
+	ColCustomInt32Type       CustomInt32Type
+	ColCustomInt64Type       CustomInt64Type
+	ColCustomFloat32Type     CustomFloat32Type
+	ColCustomFloat64Type     CustomFloat64Type
+	ColCustomUintType        CustomUintType
+	ColCustomUint8Type       CustomUint8Type
+	ColCustomUint16Type      CustomUint16Type
+	ColCustomUint32Type      CustomUint32Type
+	ColCustomUint64Type      CustomUint64Type
+	ColCustomBoolType        CustomBoolType
+	ColCustomStringType      CustomStringType
+	ColCustomTimeType        CustomTimeType
+	ColCustomSliceStringType CustomSliceStringType
+	ColSliceCustomBool       []CustomBoolType
+}
+
+type CustomTypesPtr struct {
+	ColCustomIntType         *CustomIntType
+	ColCustomInt8Type        *CustomInt8Type
+	ColCustomInt16Type       *CustomInt16Type
+	ColCustomInt32Type       *CustomInt32Type
+	ColCustomInt64Type       *CustomInt64Type
+	ColCustomFloat32Type     *CustomFloat32Type
+	ColCustomFloat64Type     *CustomFloat64Type
+	ColCustomUintType        *CustomUintType
+	ColCustomUint8Type       *CustomUint8Type
+	ColCustomUint16Type      *CustomUint16Type
+	ColCustomUint32Type      *CustomUint32Type
+	ColCustomUint64Type      *CustomUint64Type
+	ColCustomBoolType        *CustomBoolType
+	ColCustomStringType      *CustomStringType
+	ColCustomTimeType        *CustomTimeType
+	ColCustomSliceStringType *CustomSliceStringType
+	ColSliceCustomBool       *[]CustomBoolType
 }
 
 var _ = Describe("Randomise", func() {
@@ -234,95 +239,94 @@ var _ = Describe("Randomise", func() {
 		mockDate = time.Date(1989, 4, 10, 0, 0, 0, 0, time.UTC)
 
 		// returned values for seed
-		mockColInt                                 = 608169601
-		mockColInt8              int8              = 3
-		mockColInt16             int16             = 14083
-		mockColInt32             int32             = 608169604
-		mockColInt64             int64             = 608169605
-		mockColFloat32           float32           = 7.599999904632568
-		mockColFloat64                             = 9.8
-		mockColUint              uint              = 608169610
-		mockColUint8             uint8             = 221
-		mockColUint16            uint16            = 4812
-		mockColUint32            uint32            = 608169613
-		mockColUint64            uint64            = 608169614
-		mockColBool                                = true
-		mockColString                              = "l"
-		mockColTime                                = time.Date(1988, 6, 19, 0, 0, 0, 0, time.UTC)
-		mockColTestTypeEnum                        = TestTypeEnumValueB
-		mockColCustomIntType     CustomIntType     = 608169619
-		mockColCustomInt8Type    CustomInt8Type    = 21
-		mockColCustomInt16Type   CustomInt16Type   = 14101
-		mockColCustomInt32Type   CustomInt32Type   = 608169622
-		mockColCustomInt64Type   CustomInt64Type   = 608169623
-		mockColCustomFloat32Type CustomFloat32Type = 5.400000095367432
-		mockColCustomFloat64Type CustomFloat64Type = 7.6
-		mockColCustomUintType    CustomUintType    = 608169628
-		mockColCustomUint8Type   CustomUint8Type   = 239
-		mockColCustomUint16Type  CustomUint16Type  = 4830
-		mockColCustomUint32Type  CustomUint32Type  = 608169631
-		mockColCustomUint64Type  CustomUint64Type  = 608169632
-		mockColCustomBoolType    CustomBoolType    = true
-		mockColCustomStringType  CustomStringType  = "D"
-		mockColCustomTimeType                      = CustomTimeType(time.Date(2006, 12, 12, 0, 0, 0, 0, time.UTC))
-		mockColByte                                = []byte{247}
-		mockColSliceInt                            = []int{608169638}
-		mockColSliceInt8                           = []int8{40}
-		mockColSliceInt16                          = []int16{14120}
-		mockColSliceInt32                          = []int32{608169641}
-		mockColSliceInt64                          = []int64{608169642}
-		mockColSliceFloat32                        = []float32{4.300000190734863}
-		mockColSliceFloat64                        = []float64{6.5}
-		mockColSliceUint                           = []uint{608169647}
-		mockColSliceUint8                          = []uint8{3}
-		mockColSliceUint16                         = []uint16{4849}
-		mockColSliceUint32                         = []uint32{608169650}
-		mockColSliceUint64                         = []uint64{608169651}
-		mockColSliceBool                           = []bool{false}
-		mockColSliceString                         = []string{"W"}
-		mockColSliceTime                           = []time.Time{time.Date(2025, 7, 6, 0, 0, 0, 0, time.UTC)}
-		mockColSlicePtrByte                        = []*byte{uint8Ptr(11)}
-		mockColSlicePtrInt                         = []*int{intPtr(608169657)}
-		mockColSlicePtrInt8                        = []*int8{int8Ptr(59)}
-		mockColSlicePtrInt16                       = []*int16{int16Ptr(14139)}
-		mockColSlicePtrInt32                       = []*int32{int32Ptr(608169660)}
-		mockColSlicePtrInt64                       = []*int64{int64Ptr(608169661)}
-		mockColSlicePtrFloat32                     = []*float32{float32Ptr(3.200000047683716)}
-		mockColSlicePtrFloat64                     = []*float64{float64Ptr(5.4)}
-		mockColSlicePtrUint                        = []*uint{uintPtr(608169666)}
-		mockColSlicePtrUint8                       = []*uint8{uint8Ptr(22)}
-		mockColSlicePtrUint16                      = []*uint16{uint16Ptr(4868)}
-		mockColSlicePtrUint32                      = []*uint32{uint32Ptr(608169669)}
-		mockColSlicePtrUint64                      = []*uint64{uint64Ptr(608169670)}
-		mockColSlicePtrBool                        = []*bool{boolPtr(false)}
-		mockColSlicePtrString                      = []*string{stringPtr("f")}
-		mockColSlicePtrTime                        = []*time.Time{timePtr(time.Date(1984, 2, 25, 0, 0, 0, 0, time.UTC))}
-		mockColStruct                              = StructA{
+		mockColInt                     = 608169601
+		mockColInt8            int8    = 3
+		mockColInt16           int16   = 14083
+		mockColInt32           int32   = 608169604
+		mockColInt64           int64   = 608169605
+		mockColFloat32         float32 = 7.599999904632568
+		mockColFloat64                 = 9.8
+		mockColUint            uint    = 608169610
+		mockColUint8           uint8   = 221
+		mockColUint16          uint16  = 4812
+		mockColUint32          uint32  = 608169613
+		mockColUint64          uint64  = 608169614
+		mockColBool                    = true
+		mockColString                  = "l"
+		mockColTime                    = time.Date(1988, 6, 19, 0, 0, 0, 0, time.UTC)
+		mockColByte                    = []byte{229}
+		mockColSliceInt                = []int{608169620}
+		mockColSliceInt8               = []int8{22}
+		mockColSliceInt16              = []int16{14102}
+		mockColSliceInt32              = []int32{608169623}
+		mockColSliceInt64              = []int64{608169624}
+		mockColSliceFloat32            = []float32{6.5}
+		mockColSliceFloat64            = []float64{8.7}
+		mockColSliceUint               = []uint{608169629}
+		mockColSliceUint8              = []uint8{240}
+		mockColSliceUint16             = []uint16{4831}
+		mockColSliceUint32             = []uint32{608169632}
+		mockColSliceUint64             = []uint64{608169633}
+		mockColSliceBool               = []bool{true}
+		mockColSliceString             = []string{"E"}
+		mockColSliceTime               = []time.Time{time.Date(2007, 1, 13, 0, 0, 0, 0, time.UTC)}
+		mockColSlicePtrByte            = []*byte{uint8Ptr(248)}
+		mockColSlicePtrInt             = []*int{intPtr(608169639)}
+		mockColSlicePtrInt8            = []*int8{int8Ptr(41)}
+		mockColSlicePtrInt16           = []*int16{int16Ptr(14121)}
+		mockColSlicePtrInt32           = []*int32{int32Ptr(608169642)}
+		mockColSlicePtrInt64           = []*int64{int64Ptr(608169643)}
+		mockColSlicePtrFloat32         = []*float32{float32Ptr(5.400000095367432)}
+		mockColSlicePtrFloat64         = []*float64{float64Ptr(7.6)}
+		mockColSlicePtrUint            = []*uint{uintPtr(608169648)}
+		mockColSlicePtrUint8           = []*uint8{uint8Ptr(4)}
+		mockColSlicePtrUint16          = []*uint16{uint16Ptr(4850)}
+		mockColSlicePtrUint32          = []*uint32{uint32Ptr(608169651)}
+		mockColSlicePtrUint64          = []*uint64{uint64Ptr(608169652)}
+		mockColSlicePtrBool            = []*bool{boolPtr(true)}
+		mockColSlicePtrString          = []*string{stringPtr("X")}
+		mockColSlicePtrTime            = []*time.Time{timePtr(time.Date(2026, 8, 7, 0, 0, 0, 0, time.UTC))}
+		mockColStruct                  = StructA{
 			ColStructB: StructB{
 				StructC: StructC{
-					ColDeepNest: 608169684,
+					ColDeepNest: 608169666,
 				},
 			},
-			ColNested: "t",
+			ColNested: "b",
 		}
-		mockColMapStringString             = map[string]string{"uvw": "x"}
-		mockColMapStringPtrString          = map[string]*string{"yzA": stringPtr("B")}
-		mockColMapStringInt                = map[string]int{"CDE": 608169697}
-		mockColMapStringPtrInt             = map[string]*int{"GHI": intPtr(608169701)}
-		mockColMapIntSliceString           = map[int][]string{608169702: {"L"}}
-		mockColMapIntPtrSliceString        = map[int]*[]string{608169704: {"N"}}
-		mockColMapIntSlicePtrString        = map[int][]*string{608169706: {stringPtr("P")}}
-		mockColMapIntPtrSlicePtrString     = map[int]*[]*string{608169708: {stringPtr("R")}}
-		mockColMapStringMapStringString    = map[string]map[string]string{"STU": {"VWX": "Y"}}
-		mockColMapStringPtrMapStringString = map[string]*map[string]string{"Z01": {"234": "5"}}
-		mockColSliceSliceString            = [][]string{{"6"}}
-		mockColSliceSlicePtrString         = [][]*string{{stringPtr("7")}}
-		mockColOneOfString                 = "one_of_a"
-		mockColOneOfSliceTime              = []time.Time{time.Date(2017, 4, 10, 0, 0, 0, 0, time.UTC)}
-		mockColArrayString                 = [2]string{"8", "9"}
-		mockColArrayInt8ArrayPtr           = [2]*[2]*int8{{int8Ptr(2), int8Ptr(3)}, {int8Ptr(4), int8Ptr(5)}}
-		mockColSliceCustomBool             = []CustomBoolType{false}
-		mockColCustomSliceStringType       = CustomSliceStringType{"e"}
+		mockColMapStringString                               = map[string]string{"cde": "f"}
+		mockColMapStringPtrString                            = map[string]*string{"ghi": stringPtr("j")}
+		mockColMapStringInt                                  = map[string]int{"klm": 608169679}
+		mockColMapStringPtrInt                               = map[string]*int{"opq": intPtr(608169683)}
+		mockColMapIntSliceString                             = map[int][]string{608169684: {"t"}}
+		mockColMapIntPtrSliceString                          = map[int]*[]string{608169686: {"v"}}
+		mockColMapIntSlicePtrString                          = map[int][]*string{608169688: {stringPtr("x")}}
+		mockColMapIntPtrSlicePtrString                       = map[int]*[]*string{608169690: {stringPtr("z")}}
+		mockColMapStringMapStringString                      = map[string]map[string]string{"ABC": {"DEF": "G"}}
+		mockColMapStringPtrMapStringString                   = map[string]*map[string]string{"HIJ": {"KLM": "N"}}
+		mockColSliceSliceString                              = [][]string{{"O"}}
+		mockColSliceSlicePtrString                           = [][]*string{{stringPtr("P")}}
+		mockColArrayString                                   = [2]string{"Q", "R"}
+		mockColArrayInt8ArrayPtr                             = [2]*[2]*int8{{int8Ptr(111), int8Ptr(112)}, {int8Ptr(113), int8Ptr(114)}}
+		mockColCustomIntType               CustomIntType     = 608169601
+		mockColCustomInt8Type              CustomInt8Type    = 3
+		mockColCustomInt16Type             CustomInt16Type   = 14083
+		mockColCustomInt32Type             CustomInt32Type   = 608169604
+		mockColCustomInt64Type             CustomInt64Type   = 608169605
+		mockColCustomFloat32Type           CustomFloat32Type = 7.599999904632568
+		mockColCustomFloat64Type           CustomFloat64Type = 9.8
+		mockColCustomUintType              CustomUintType    = 608169610
+		mockColCustomUint8Type             CustomUint8Type   = 221
+		mockColCustomUint16Type            CustomUint16Type  = 4812
+		mockColCustomUint32Type            CustomUint32Type  = 608169613
+		mockColCustomUint64Type            CustomUint64Type  = 608169614
+		mockColCustomBoolType              CustomBoolType    = true
+		mockColCustomStringType            CustomStringType  = "l"
+		mockColCustomTimeType                                = CustomTimeType(time.Date(1988, 6, 19, 0, 0, 0, 0, time.UTC))
+		mockColCustomSliceStringType                         = CustomSliceStringType{"p"}
+		mockColSliceCustomBool                               = []CustomBoolType{true}
+		//mockColOneOfString                                   = "one_of_a"
+		//mockColOneOfSliceTime                                = []time.Time{time.Date(2017, 4, 10, 0, 0, 0, 0, time.UTC)}
 
 		typeProvider = func(value reflect.Value, typ reflect.Type, _ string) error {
 			values := []TestTypeEnum{
@@ -346,20 +350,16 @@ var _ = Describe("Randomise", func() {
 	BeforeEach(func() {
 		r = randomise.NewRandomise()
 		r.SetSeed(mockDate.Unix())
-		r.AddTypeProvider("ColTestTypeEnum", typeProvider)
+		r.AddTypeConfig("ColTestTypeEnum", randomise.Config{
+			Provider: typeProvider,
+		})
 	})
 
-	Context("when a struct is passed without pointers", func() {
-
-		BeforeEach(func() {
-			r.AddTypeProvider("ColProviderOneOfString", randomise.OneOf("one_of_a", "one_of_b"))
-			r.AddTypeProvider("ColProviderOneOfSliceTime", randomise.OneOf([]time.Time{time.Date(2017, 4, 10, 0, 0, 0, 0, time.UTC)}, []time.Time{time.Date(2020, 4, 10, 0, 0, 0, 0, time.UTC)}))
-		})
-
+	Context("when a struct is passed with base types", func() {
 		It("should return randomised struct", func() {
-			t := Test{}
+			t := BaseTypes{}
 			Expect(r.Struct(&t)).To(Succeed())
-			Expect(t).To(Equal(Test{
+			Expect(t).To(Equal(BaseTypes{
 				ColInt:                         mockColInt,
 				ColInt8:                        mockColInt8,
 				ColInt16:                       mockColInt16,
@@ -375,22 +375,6 @@ var _ = Describe("Randomise", func() {
 				ColBool:                        mockColBool,
 				ColString:                      mockColString,
 				ColTime:                        mockColTime,
-				ColTestTypeEnum:                mockColTestTypeEnum,
-				ColCustomIntType:               mockColCustomIntType,
-				ColCustomInt8Type:              mockColCustomInt8Type,
-				ColCustomInt16Type:             mockColCustomInt16Type,
-				ColCustomInt32Type:             mockColCustomInt32Type,
-				ColCustomInt64Type:             mockColCustomInt64Type,
-				ColCustomFloat32Type:           mockColCustomFloat32Type,
-				ColCustomFloat64Type:           mockColCustomFloat64Type,
-				ColCustomUintType:              mockColCustomUintType,
-				ColCustomUint8Type:             mockColCustomUint8Type,
-				ColCustomUint16Type:            mockColCustomUint16Type,
-				ColCustomUint32Type:            mockColCustomUint32Type,
-				ColCustomUint64Type:            mockColCustomUint64Type,
-				ColCustomBoolType:              mockColCustomBoolType,
-				ColCustomStringType:            mockColCustomStringType,
-				ColCustomTimeType:              mockColCustomTimeType,
 				ColByte:                        mockColByte,
 				ColSliceInt:                    mockColSliceInt,
 				ColSliceInt8:                   mockColSliceInt8,
@@ -436,8 +420,6 @@ var _ = Describe("Randomise", func() {
 				ColMapStringPtrMapStringString: mockColMapStringPtrMapStringString,
 				ColSliceSliceString:            mockColSliceSliceString,
 				ColSliceSlicePtrString:         mockColSliceSlicePtrString,
-				ColProviderOneOfString:         mockColOneOfString,
-				ColProviderOneOfSliceTime:      mockColOneOfSliceTime,
 				ColInterface:                   nil,
 				ColSliceInterface:              nil,
 				ColMapStringInterface:          nil,
@@ -445,23 +427,15 @@ var _ = Describe("Randomise", func() {
 				ColArrayArrayInt8Ptr:           mockColArrayInt8ArrayPtr,
 				ColChanString:                  nil,
 				ColSliceChanString:             nil,
-				ColSliceCustomBool:             mockColSliceCustomBool,
-				ColCustomSliceStringType:       mockColCustomSliceStringType,
 			}))
 		})
 	})
 
-	Context("when a struct is passed with pointers", func() {
-		BeforeEach(func() {
-			r.AddTypeProvider("ColProviderOneOfString", randomise.OneOf(stringPtr("one_of_a"), stringPtr("one_of_b")))
-			t1 := []time.Time{time.Date(2017, 4, 10, 0, 0, 0, 0, time.UTC)}
-			t2 := []time.Time{time.Date(2020, 4, 10, 0, 0, 0, 0, time.UTC)}
-			r.AddTypeProvider("ColProviderOneOfSliceTime", randomise.OneOf(&t1, &t2))
-		})
+	Context("when a struct is passed with base types as pointers", func() {
 		It("should return randomised struct", func() {
-			t := TestPtr{}
+			t := BaseTypesPtr{}
 			Expect(r.Struct(&t)).To(Succeed())
-			Expect(t).To(Equal(TestPtr{
+			Expect(t).To(Equal(BaseTypesPtr{
 				ColInt:                         &mockColInt,
 				ColInt8:                        &mockColInt8,
 				ColInt16:                       &mockColInt16,
@@ -477,22 +451,6 @@ var _ = Describe("Randomise", func() {
 				ColBool:                        &mockColBool,
 				ColString:                      &mockColString,
 				ColTime:                        &mockColTime,
-				ColTestTypeEnum:                &mockColTestTypeEnum,
-				ColCustomIntType:               &mockColCustomIntType,
-				ColCustomInt8Type:              &mockColCustomInt8Type,
-				ColCustomInt16Type:             &mockColCustomInt16Type,
-				ColCustomInt32Type:             &mockColCustomInt32Type,
-				ColCustomInt64Type:             &mockColCustomInt64Type,
-				ColCustomFloat32Type:           &mockColCustomFloat32Type,
-				ColCustomFloat64Type:           &mockColCustomFloat64Type,
-				ColCustomUintType:              &mockColCustomUintType,
-				ColCustomUint8Type:             &mockColCustomUint8Type,
-				ColCustomUint16Type:            &mockColCustomUint16Type,
-				ColCustomUint32Type:            &mockColCustomUint32Type,
-				ColCustomUint64Type:            &mockColCustomUint64Type,
-				ColCustomBoolType:              &mockColCustomBoolType,
-				ColCustomStringType:            &mockColCustomStringType,
-				ColCustomTimeType:              &mockColCustomTimeType,
 				ColByte:                        &mockColByte,
 				ColSliceInt:                    &mockColSliceInt,
 				ColSliceInt8:                   &mockColSliceInt8,
@@ -538,8 +496,6 @@ var _ = Describe("Randomise", func() {
 				ColMapStringPtrMapStringString: &mockColMapStringPtrMapStringString,
 				ColSliceSliceString:            &mockColSliceSliceString,
 				ColSliceSlicePtrString:         &mockColSliceSlicePtrString,
-				ColProviderOneOfString:         &mockColOneOfString,
-				ColProviderOneOfSliceTime:      &mockColOneOfSliceTime,
 				ColInterface:                   nil,
 				ColSliceInterface:              nil,
 				ColMapStringInterface:          nil,
@@ -547,8 +503,60 @@ var _ = Describe("Randomise", func() {
 				ColArrayArrayInt8Ptr:           &mockColArrayInt8ArrayPtr,
 				ColChanString:                  nil,
 				ColSliceChanString:             nil,
-				ColSliceCustomBool:             &mockColSliceCustomBool,
-				ColCustomSliceStringType:       &mockColCustomSliceStringType,
+			}))
+		})
+	})
+
+	Describe("custom types", func() {
+		Context("non-pointers", func() {
+			It("should return randomised struct", func() {
+				t := CustomTypes{}
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(t).To(Equal(CustomTypes{
+					ColCustomIntType:         mockColCustomIntType,
+					ColCustomInt8Type:        mockColCustomInt8Type,
+					ColCustomInt16Type:       mockColCustomInt16Type,
+					ColCustomInt32Type:       mockColCustomInt32Type,
+					ColCustomInt64Type:       mockColCustomInt64Type,
+					ColCustomFloat32Type:     mockColCustomFloat32Type,
+					ColCustomFloat64Type:     mockColCustomFloat64Type,
+					ColCustomUintType:        mockColCustomUintType,
+					ColCustomUint8Type:       mockColCustomUint8Type,
+					ColCustomUint16Type:      mockColCustomUint16Type,
+					ColCustomUint32Type:      mockColCustomUint32Type,
+					ColCustomUint64Type:      mockColCustomUint64Type,
+					ColCustomBoolType:        mockColCustomBoolType,
+					ColCustomStringType:      mockColCustomStringType,
+					ColCustomTimeType:        mockColCustomTimeType,
+					ColCustomSliceStringType: mockColCustomSliceStringType,
+					ColSliceCustomBool:       mockColSliceCustomBool,
+				}))
+			})
+		})
+	})
+
+	Context("pointers", func() {
+		It("should return randomised struct", func() {
+			t := CustomTypesPtr{}
+			Expect(r.Struct(&t)).To(Succeed())
+			Expect(t).To(Equal(CustomTypesPtr{
+				ColCustomIntType:         &mockColCustomIntType,
+				ColCustomInt8Type:        &mockColCustomInt8Type,
+				ColCustomInt16Type:       &mockColCustomInt16Type,
+				ColCustomInt32Type:       &mockColCustomInt32Type,
+				ColCustomInt64Type:       &mockColCustomInt64Type,
+				ColCustomFloat32Type:     &mockColCustomFloat32Type,
+				ColCustomFloat64Type:     &mockColCustomFloat64Type,
+				ColCustomUintType:        &mockColCustomUintType,
+				ColCustomUint8Type:       &mockColCustomUint8Type,
+				ColCustomUint16Type:      &mockColCustomUint16Type,
+				ColCustomUint32Type:      &mockColCustomUint32Type,
+				ColCustomUint64Type:      &mockColCustomUint64Type,
+				ColCustomBoolType:        &mockColCustomBoolType,
+				ColCustomStringType:      &mockColCustomStringType,
+				ColCustomTimeType:        &mockColCustomTimeType,
+				ColCustomSliceStringType: &mockColCustomSliceStringType,
+				ColSliceCustomBool:       &mockColSliceCustomBool,
 			}))
 		})
 	})
