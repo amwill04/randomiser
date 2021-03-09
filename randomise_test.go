@@ -47,10 +47,6 @@ type StructC struct {
 	ColDeepNest int
 }
 
-type CustomInterface interface {
-	Method() string
-}
-
 type Test struct {
 	ColInt                         int
 	ColInt8                        int8
@@ -139,7 +135,6 @@ type Test struct {
 	ColSliceChanString             []chan string
 	ColSliceCustomBool             []CustomBoolType
 	ColCustomSliceStringType       CustomSliceStringType
-	ColCustomInterface             CustomInterface
 }
 
 type TestPtr struct {
@@ -230,7 +225,6 @@ type TestPtr struct {
 	ColSliceChanString             *[]chan string
 	ColSliceCustomBool             *[]CustomBoolType
 	ColCustomSliceStringType       *CustomSliceStringType
-	ColCustomInterface             *CustomInterface
 }
 
 var _ = Describe("Randomise", func() {

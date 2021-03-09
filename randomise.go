@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	interfaceRegex = regexp.MustCompile("(interface {})|\\bchan\\b")
+	ignoreRegex = regexp.MustCompile("(\\binterface\\b)|\\bchan\\b")
 )
 
 func NewRandomise() Random {
@@ -92,9 +92,6 @@ func (r Random) Struct(dst interface{}) error {
 	for i := 0; i < nFields; i++ {
 		fieldVal := value.Field(i)
 		fieldTyp := typ.Field(i)
-		if interfaceRegex.MatchString(fieldTyp.Type.String()) {
-			continue
-		}
 		if random, ok := r.typeProviders[fieldTyp.Name]; ok {
 			if err := random(fieldVal, fieldTyp.Type, fieldTyp.Name); err != nil {
 				return err
@@ -144,6 +141,9 @@ func (r Random) randomiseField(value reflect.Value, typ reflect.Type, keyLength 
 		kind := value.Kind()
 		if value.Kind() == reflect.Ptr {
 			kind = typ.Elem().Kind()
+		}
+		if ignoreRegex.MatchString(typ.String()) {
+			return nil
 		}
 		if err := r.randomiseCustomField(value, kind, typ, keyLength); err != nil {
 			return err
