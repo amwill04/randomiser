@@ -1,8 +1,6 @@
 package randomise_test
 
 import (
-	"math/rand"
-	"reflect"
 	"testing"
 	"time"
 
@@ -11,7 +9,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type TestTypeEnum string
 type CustomIntType int
 type CustomInt8Type int8
 type CustomInt16Type int16
@@ -33,11 +30,6 @@ func (t CustomTimeType) String() string {
 	ts := time.Time(t)
 	return ts.Format(time.RFC3339)
 }
-
-const (
-	TestTypeEnumValueA TestTypeEnum = "value_a"
-	TestTypeEnumValueB TestTypeEnum = "value_b"
-)
 
 type StructA struct {
 	ColStructB StructB
@@ -328,31 +320,28 @@ var _ = Describe("Randomise", func() {
 		//mockColOneOfString                                   = "one_of_a"
 		//mockColOneOfSliceTime                                = []time.Time{time.Date(2017, 4, 10, 0, 0, 0, 0, time.UTC)}
 
-		typeProvider = func(value reflect.Value, typ reflect.Type, _ string) error {
-			values := []TestTypeEnum{
-				TestTypeEnumValueA,
-				TestTypeEnumValueB,
-			}
-			v := values[rand.Intn(len(values))]
-			var newValue reflect.Value
-			if typ.Kind() == reflect.Ptr {
-				newType := reflect.New(typ.Elem())
-				newValue = reflect.ValueOf(&v).Convert(newType.Type())
-			} else {
-				newType := reflect.New(typ).Elem()
-				newValue = reflect.ValueOf(v).Convert(newType.Type())
-			}
-			value.Set(newValue)
-			return nil
-		}
+		//typeProvider = func(value reflect.Value, typ reflect.Type, _ string) error {
+		//	values := []TestTypeEnum{
+		//		TestTypeEnumValueA,
+		//		TestTypeEnumValueB,
+		//	}
+		//	v := values[rand.Intn(len(values))]
+		//	var newValue reflect.Value
+		//	if typ.Kind() == reflect.Ptr {
+		//		newType := reflect.New(typ.Elem())
+		//		newValue = reflect.ValueOf(&v).Convert(newType.Type())
+		//	} else {
+		//		newType := reflect.New(typ).Elem()
+		//		newValue = reflect.ValueOf(v).Convert(newType.Type())
+		//	}
+		//	value.Set(newValue)
+		//	return nil
+		//}
 	)
 
 	BeforeEach(func() {
 		r = randomise.NewRandomise()
 		r.SetSeed(mockDate.Unix())
-		r.AddTypeConfig("ColTestTypeEnum", randomise.Config{
-			Provider: typeProvider,
-		})
 	})
 
 	Context("when a struct is passed with base types", func() {
@@ -558,6 +547,72 @@ var _ = Describe("Randomise", func() {
 				ColCustomSliceStringType: &mockColCustomSliceStringType,
 				ColSliceCustomBool:       &mockColSliceCustomBool,
 			}))
+		})
+	})
+
+	Describe("AddTypeConfig() is called", func() {
+		Describe("when OneOf() Provider", func() {
+
+			type EnumType string
+			type Test struct {
+				Field EnumType
+			}
+
+			var (
+				optionA = EnumType("option_a")
+				optionB = EnumType("option_b")
+			)
+
+			Context("when is declared with incorrect type", func() {
+				It("it should return MalformedProviderType", func() {
+					t := Test{}
+					r.AddTypeConfig("Field", randomise.Config{
+						Provider: randomise.OneOf("option_a", "option_b"),
+					})
+					err := r.Struct(&t)
+					Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
+				})
+			})
+
+			Context("when is declared with correct type", func() {
+				It("it should set field", func() {
+					t := Test{}
+					r.AddTypeConfig("Field", randomise.Config{
+						Provider: randomise.OneOf(optionA, optionB),
+					})
+					Expect(r.Struct(&t)).To(Succeed())
+					Expect(t.Field).To(Equal(optionB))
+				})
+			})
+		})
+
+		Describe("when As() Provider", func() {
+
+			type Test struct {
+				Field string
+			}
+
+			Context("when is declared with incorrect type", func() {
+				It("it should return MalformedProviderType", func() {
+					t := Test{}
+					r.AddTypeConfig("Field", randomise.Config{
+						Provider: randomise.As(100),
+					})
+					err := r.Struct(&t)
+					Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
+				})
+			})
+
+			Context("when is declared with correct type", func() {
+				It("it should set field", func() {
+					t := Test{}
+					r.AddTypeConfig("Field", randomise.Config{
+						Provider: randomise.As("option_a"),
+					})
+					Expect(r.Struct(&t)).To(Succeed())
+					Expect(t.Field).To(Equal("option_a"))
+				})
+			})
 		})
 	})
 })
