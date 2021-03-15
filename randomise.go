@@ -20,9 +20,9 @@ func NewRandomise() Random {
 	defaultConfig := Config{
 		Provider:     nil,
 		MapKeyLength: 3,
-		StringLength: 1,
-		SliceLength:  1,
-		MapLength:    1,
+		StringLength: 3,
+		SliceLength:  3,
+		MapLength:    3,
 	}
 	return Random{
 		seed:           nil,
