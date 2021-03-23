@@ -17,7 +17,6 @@ type reasonMalformed string
 
 const (
 	reasonMalformedNoCreatedWithNew reasonMalformed = "random was not created using NewRandomise()"
-	reasonMalformedSeedNotSet       reasonMalformed = "seed was not set. use r.SetSeed(int64)"
 )
 
 type MalformedRandom struct {

@@ -1,31 +1,29 @@
 package randomise
 
 import (
-	"bytes"
 	"fmt"
-	"math"
 	"math/rand"
 	"reflect"
 	"regexp"
-	"sync/atomic"
 	"time"
+	"unsafe"
 )
 
 var (
 	ignoreRegex = regexp.MustCompile("(\\binterface\\b)|\\bchan\\b")
 )
 
-func NewRandomise() Random {
+func NewRandomise(seed int64) Random {
+	rand.Seed(seed)
 	configs := make(map[string]Config)
 	defaultConfig := Config{
 		Provider:     nil,
-		MapKeyLength: 3,
-		StringLength: 3,
+		MapKeyLength: 5,
+		StringLength: 5,
 		SliceLength:  3,
 		MapLength:    3,
 	}
 	return Random{
-		seed:           nil,
 		configs:        configs,
 		currentConfig:  nil,
 		defaultConfig:  &defaultConfig,
@@ -42,7 +40,6 @@ type Config struct {
 }
 
 type Random struct {
-	seed           *seed
 	configs        map[string]Config
 	currentConfig  *Config
 	defaultConfig  *Config
@@ -65,28 +62,13 @@ func (r *Random) SetMapKeyLength(length int) {
 	r.defaultConfig.MapKeyLength = length
 }
 
-func (r *Random) SetSeed(s int64) {
-	rand.Seed(s)
-	newSeed := seed(s)
-	r.seed = &newSeed
-}
-
 func (r *Random) AddTypeConfig(name string, config Config) {
 	r.configs[name] = config
-}
-
-type seed int64
-
-func (s *seed) nextInt() int64 {
-	return atomic.AddInt64((*int64)(s), 1)
 }
 
 func (r *Random) Struct(dst interface{}) error {
 	if !r.createdWithNew {
 		return MalformedRandom{reason: reasonMalformedNoCreatedWithNew}
-	}
-	if r.seed == nil {
-		panic(MalformedRandom{reason: reasonMalformedSeedNotSet})
 	}
 	value := reflect.ValueOf(dst)
 	if value.Kind() != reflect.Ptr {
@@ -147,7 +129,7 @@ func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *in
 	case uint, *uint:
 		r.randomiseUInt(value, typ)
 	case bool, *bool:
-		randomiseBool(value, typ)
+		r.randomiseBool(value, typ)
 	case string, *string:
 		l := r.currentConfig.StringLength
 		if length != nil {
@@ -198,7 +180,7 @@ func (r Random) randomiseCustomField(value reflect.Value, kind reflect.Kind, typ
 	case reflect.Uint:
 		r.randomiseUInt(value, typ)
 	case reflect.Bool:
-		randomiseBool(value, typ)
+		r.randomiseBool(value, typ)
 	case reflect.String:
 		l := r.currentConfig.StringLength
 		if length != nil {
@@ -233,8 +215,15 @@ func (r Random) randomiseCustomField(value reflect.Value, kind reflect.Kind, typ
 	return nil
 }
 
+const (
+	int8Mask   = 1<<7 - 1
+	int16Mask  = 1<<15 - 1
+	uint8Mask  = 1<<8 - 1
+	uint16Mask = 1<<16 - 1
+)
+
 func (r Random) randomInt8() int8 {
-	return int8(r.seed.nextInt() % math.MaxInt8)
+	return int8(rand.Int63() & int8Mask)
 }
 
 func (r Random) randomiseInt8(value reflect.Value, typ reflect.Type) {
@@ -251,7 +240,7 @@ func (r Random) randomiseInt8(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomInt16() int16 {
-	return int16(r.seed.nextInt() % math.MaxInt16)
+	return int16(rand.Int63() & int16Mask)
 }
 
 func (r Random) randomiseInt16(value reflect.Value, typ reflect.Type) {
@@ -268,7 +257,7 @@ func (r Random) randomiseInt16(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomInt32() int32 {
-	return int32(r.seed.nextInt() % math.MaxInt32)
+	return rand.Int31()
 }
 
 func (r Random) randomiseInt32(value reflect.Value, typ reflect.Type) {
@@ -285,7 +274,7 @@ func (r Random) randomiseInt32(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomInt64() int64 {
-	return r.seed.nextInt() % math.MaxInt64
+	return rand.Int63()
 }
 
 func (r Random) randomiseInt64(value reflect.Value, typ reflect.Type) {
@@ -302,7 +291,7 @@ func (r Random) randomiseInt64(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomInt() int {
-	return int(r.seed.nextInt())
+	return rand.Int()
 }
 
 func (r Random) randomiseInt(value reflect.Value, typ reflect.Type) {
@@ -319,7 +308,7 @@ func (r Random) randomiseInt(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomFloat32() float32 {
-	return float32(r.seed.nextInt()%10)/10.0 + float32(r.seed.nextInt()%10)
+	return rand.Float32()
 }
 
 func (r Random) randomiseFloat32(value reflect.Value, typ reflect.Type) {
@@ -336,7 +325,7 @@ func (r Random) randomiseFloat32(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomFloat64() float64 {
-	return float64(r.seed.nextInt()%10)/10.0 + float64(r.seed.nextInt()%10)
+	return rand.Float64()
 }
 
 func (r Random) randomiseFloat64(value reflect.Value, typ reflect.Type) {
@@ -353,7 +342,7 @@ func (r Random) randomiseFloat64(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomUInt8() uint8 {
-	return uint8(r.seed.nextInt() % math.MaxUint8)
+	return uint8(rand.Int63() & uint8Mask)
 }
 
 func (r Random) randomiseUInt8(value reflect.Value, typ reflect.Type) {
@@ -370,7 +359,7 @@ func (r Random) randomiseUInt8(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomUInt16() uint16 {
-	return uint16(r.seed.nextInt() % math.MaxUint16)
+	return uint16(rand.Int63() & uint16Mask)
 }
 
 func (r Random) randomiseUInt16(value reflect.Value, typ reflect.Type) {
@@ -387,7 +376,7 @@ func (r Random) randomiseUInt16(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomUInt32() uint32 {
-	return uint32(r.seed.nextInt() % math.MaxUint32)
+	return rand.Uint32()
 }
 
 func (r Random) randomiseUInt32(value reflect.Value, typ reflect.Type) {
@@ -404,7 +393,7 @@ func (r Random) randomiseUInt32(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomUInt64() uint64 {
-	return uint64(r.seed.nextInt())
+	return rand.Uint64()
 }
 
 func (r Random) randomiseUInt64(value reflect.Value, typ reflect.Type) {
@@ -421,7 +410,7 @@ func (r Random) randomiseUInt64(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomUInt() uint {
-	return uint(r.seed.nextInt())
+	return uint(rand.Uint64())
 }
 
 func (r Random) randomiseUInt(value reflect.Value, typ reflect.Type) {
@@ -438,11 +427,11 @@ func (r Random) randomiseUInt(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomBool() bool {
-	return rand.Intn(2) == 1
+	return rand.Int31()&1 == 1
 }
 
-func randomiseBool(value reflect.Value, typ reflect.Type) {
-	v := rand.Intn(2) == 1
+func (r Random) randomiseBool(value reflect.Value, typ reflect.Type) {
+	v := r.randomBool()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -454,15 +443,27 @@ func randomiseBool(value reflect.Value, typ reflect.Type) {
 	value.Set(newValue)
 }
 
-const alphabetAll = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const alphabetAll = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const (
+	letterIdxBits = 6
+	letterIdxMask = 1<<letterIdxBits - 1
+	letterIdxMax  = 63 / letterIdxBits
+)
 
 func (r Random) randomString(length int) string {
-	str := bytes.Buffer{}
-	str.Grow(length)
-	for i := 0; i < length; i++ {
-		str.WriteByte(alphabetAll[r.seed.nextInt()%int64(len(alphabetAll))])
+	b := make([]byte, length)
+	for i, cache, remain := length-1, rand.Int63(), letterIdxMax; i >= 0; {
+		if remain == 0 {
+			cache, remain = rand.Int63(), letterIdxMax
+		}
+		if idx := int(cache & letterIdxMask); idx < len(alphabetAll) {
+			b[i] = alphabetAll[idx]
+			i--
+		}
+		cache >>= letterIdxBits
+		remain--
 	}
-	return str.String()
+	return *(*string)(unsafe.Pointer(&b))
 }
 
 func (r Random) randomiseString(value reflect.Value, typ reflect.Type, length int) {
@@ -479,16 +480,7 @@ func (r Random) randomiseString(value reflect.Value, typ reflect.Type, length in
 }
 
 func (r Random) randomTime() time.Time {
-	return time.Date(
-		int(1972+r.seed.nextInt()%60),
-		time.Month(1+(r.seed.nextInt()%12)),
-		int(1+(r.seed.nextInt()%25)),
-		0,
-		0,
-		0,
-		0,
-		time.UTC,
-	)
+	return time.Unix(int64(rand.Uint32()), 0).UTC()
 }
 
 func (r Random) randomiseTime(value reflect.Value, typ reflect.Type) (err error) {

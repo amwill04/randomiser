@@ -226,97 +226,103 @@ type CustomTypesPtr struct {
 
 var _ = Describe("Randomise", func() {
 	var (
-		r randomise.Random
-
+		r        randomise.Random
 		mockDate = time.Date(1989, 4, 10, 0, 0, 0, 0, time.UTC)
-
 		// returned values for seed
-		mockColInt                     = 608169601
-		mockColInt8            int8    = 3
-		mockColInt16           int16   = 14083
-		mockColInt32           int32   = 608169604
-		mockColInt64           int64   = 608169605
-		mockColFloat32         float32 = 7.599999904632568
-		mockColFloat64                 = 9.8
-		mockColUint            uint    = 608169610
-		mockColUint8           uint8   = 221
-		mockColUint16          uint16  = 4812
-		mockColUint32          uint32  = 608169613
-		mockColUint64          uint64  = 608169614
-		mockColBool                    = true
-		mockColString                  = "l"
-		mockColTime                    = time.Date(1988, 6, 19, 0, 0, 0, 0, time.UTC)
-		mockColByte                    = []byte{229}
-		mockColSliceInt                = []int{608169620}
-		mockColSliceInt8               = []int8{22}
-		mockColSliceInt16              = []int16{14102}
-		mockColSliceInt32              = []int32{608169623}
-		mockColSliceInt64              = []int64{608169624}
-		mockColSliceFloat32            = []float32{6.5}
-		mockColSliceFloat64            = []float64{8.7}
-		mockColSliceUint               = []uint{608169629}
-		mockColSliceUint8              = []uint8{240}
-		mockColSliceUint16             = []uint16{4831}
-		mockColSliceUint32             = []uint32{608169632}
-		mockColSliceUint64             = []uint64{608169633}
-		mockColSliceBool               = []bool{true}
-		mockColSliceString             = []string{"E"}
-		mockColSliceTime               = []time.Time{time.Date(2007, 1, 13, 0, 0, 0, 0, time.UTC)}
-		mockColSlicePtrByte            = []*byte{uint8Ptr(248)}
-		mockColSlicePtrInt             = []*int{intPtr(608169639)}
-		mockColSlicePtrInt8            = []*int8{int8Ptr(41)}
-		mockColSlicePtrInt16           = []*int16{int16Ptr(14121)}
-		mockColSlicePtrInt32           = []*int32{int32Ptr(608169642)}
-		mockColSlicePtrInt64           = []*int64{int64Ptr(608169643)}
-		mockColSlicePtrFloat32         = []*float32{float32Ptr(5.400000095367432)}
-		mockColSlicePtrFloat64         = []*float64{float64Ptr(7.6)}
-		mockColSlicePtrUint            = []*uint{uintPtr(608169648)}
-		mockColSlicePtrUint8           = []*uint8{uint8Ptr(4)}
-		mockColSlicePtrUint16          = []*uint16{uint16Ptr(4850)}
-		mockColSlicePtrUint32          = []*uint32{uint32Ptr(608169651)}
-		mockColSlicePtrUint64          = []*uint64{uint64Ptr(608169652)}
-		mockColSlicePtrBool            = []*bool{boolPtr(true)}
-		mockColSlicePtrString          = []*string{stringPtr("X")}
-		mockColSlicePtrTime            = []*time.Time{timePtr(time.Date(2026, 8, 7, 0, 0, 0, 0, time.UTC))}
-		mockColStruct                  = StructA{
+		mockColInt                  = 8787071967939076494
+		mockColInt8         int8    = 107
+		mockColInt16        int16   = 9439
+		mockColInt32        int32   = 1390727781
+		mockColInt64        int64   = 7308617895889833901
+		mockColFloat32      float32 = 0.35669761896133423
+		mockColFloat64              = 0.8673022323772911
+		mockColUint         uint    = 16664198805663444872
+		mockColUint8        uint8   = 143
+		mockColUint16       uint16  = 57949
+		mockColUint32       uint32  = 448464110
+		mockColUint64       uint64  = 15820576590339358265
+		mockColBool                 = true
+		mockColString               = "szsVg"
+		mockColTime                 = time.Date(2019, 7, 10, 10, 29, 10, 0, time.UTC)
+		mockColByte                 = []byte{132, 214, 122}
+		mockColSliceInt             = []int{3230138054492229965, 5693379029502621857, 9136199962177605632}
+		mockColSliceInt8            = []int8{63, 64, 113}
+		mockColSliceInt16           = []int16{34, 19738, 31068}
+		mockColSliceInt32           = []int32{1272815704, 60700214, 412302932}
+		mockColSliceInt64           = []int64{2754645531795864364, 2366225202029597505, 4487628403179330665}
+		mockColSliceFloat32         = []float32{0.6270144581794739, 0.301972895860672, 0.5439574122428894}
+		mockColSliceFloat64         = []float64{0.6523531507725464, 0.43047202351692165, 0.03410745948605001}
+		mockColSliceUint            = []uint{1168718378530842714, 2176072750557506790, 14978333317498209884}
+		mockColSliceUint8           = []uint8{109, 192, 211}
+		mockColSliceUint16          = []uint16{37344, 48231, 18500}
+		mockColSliceUint32          = []uint32{3677989657, 3361622017, 3481103586}
+		mockColSliceUint64          = []uint64{8682075873787985163, 11827493833822128684, 4463540894904265705}
+		mockColSliceBool            = []bool{true, false, true}
+		mockColSliceString          = []string{"pirWZ", "CDYBY", "qrVma"}
+		mockColSliceTime            = []time.Time{
+			time.Date(2012, 3, 12, 6, 19, 32, 0, time.UTC),
+			time.Date(1993, 11, 6, 19, 19, 31, 0, time.UTC),
+			time.Date(2098, 11, 7, 6, 18, 2, 0, time.UTC),
+		}
+		mockColSlicePtrByte    = []*byte{uint8Ptr(82), uint8Ptr(213), uint8Ptr(133)}
+		mockColSlicePtrInt     = []*int{intPtr(6939730804350152927), intPtr(2668961733473876525), intPtr(8453202931772817696)}
+		mockColSlicePtrInt8    = []*int8{int8Ptr(41), int8Ptr(7), int8Ptr(96)}
+		mockColSlicePtrInt16   = []*int16{int16Ptr(13713), int16Ptr(26634), int16Ptr(19476)}
+		mockColSlicePtrInt32   = []*int32{int32Ptr(2066005117), int32Ptr(279068369), int32Ptr(111637746)}
+		mockColSlicePtrInt64   = []*int64{int64Ptr(4803358365381946569), int64Ptr(1429517074973534657), int64Ptr(8973270389744226874)}
+		mockColSlicePtrFloat32 = []*float32{float32Ptr(0.8568808436393738), float32Ptr(0.9400718808174133), float32Ptr(0.18035414814949036)}
+		mockColSlicePtrFloat64 = []*float64{float64Ptr(0.9655046289649432), float64Ptr(0.9106112503030606), float64Ptr(0.793657749423185)}
+		mockColSlicePtrUint    = []*uint{uintPtr(10627171034352290137), uintPtr(14859217705895579391), uintPtr(15812424427762282072)}
+		mockColSlicePtrUint8   = []*uint8{uint8Ptr(231), uint8Ptr(187), uint8Ptr(134)}
+		mockColSlicePtrUint16  = []*uint16{uint16Ptr(38239), uint16Ptr(48701), uint16Ptr(53547)}
+		mockColSlicePtrUint32  = []*uint32{uint32Ptr(187490652), uint32Ptr(1814042450), uint32Ptr(3321555961)}
+		mockColSlicePtrUint64  = []*uint64{uint64Ptr(5117774601994015311), uint64Ptr(14646683301499314643), uint64Ptr(14068097394368840198)}
+		mockColSlicePtrBool    = []*bool{boolPtr(true), boolPtr(true), boolPtr(true)}
+		mockColSlicePtrString  = []*string{stringPtr("xmQBu"), stringPtr("gsEcy"), stringPtr("AwVej")}
+		mockColSlicePtrTime    = []*time.Time{
+			timePtr(time.Date(2016, 6, 26, 11, 22, 8, 0, time.UTC)),
+			timePtr(time.Date(2071, 3, 29, 3, 57, 12, 0, time.UTC)),
+			timePtr(time.Date(2086, 10, 15, 19, 51, 38, 0, time.UTC)),
+		}
+		mockColStruct = StructA{
 			ColStructB: StructB{
 				StructC: StructC{
-					ColDeepNest: 608169666,
+					ColDeepNest: 6869688774120787965,
 				},
 			},
-			ColNested: "b",
+			ColNested: "CgtFj",
 		}
-		mockColMapStringString                               = map[string]string{"cde": "f"}
-		mockColMapStringPtrString                            = map[string]*string{"ghi": stringPtr("j")}
-		mockColMapStringInt                                  = map[string]int{"klm": 608169679}
-		mockColMapStringPtrInt                               = map[string]*int{"opq": intPtr(608169683)}
-		mockColMapIntSliceString                             = map[int][]string{608169684: {"t"}}
-		mockColMapIntPtrSliceString                          = map[int]*[]string{608169686: {"v"}}
-		mockColMapIntSlicePtrString                          = map[int][]*string{608169688: {stringPtr("x")}}
-		mockColMapIntPtrSlicePtrString                       = map[int]*[]*string{608169690: {stringPtr("z")}}
-		mockColMapStringMapStringString                      = map[string]map[string]string{"ABC": {"DEF": "G"}}
-		mockColMapStringPtrMapStringString                   = map[string]*map[string]string{"HIJ": {"KLM": "N"}}
-		mockColSliceSliceString                              = [][]string{{"O"}}
-		mockColSliceSlicePtrString                           = [][]*string{{stringPtr("P")}}
-		mockColArrayString                                   = [2]string{"Q", "R"}
-		mockColArrayInt8ArrayPtr                             = [2]*[2]*int8{{int8Ptr(111), int8Ptr(112)}, {int8Ptr(113), int8Ptr(114)}}
-		mockColCustomIntType               CustomIntType     = 608169601
-		mockColCustomInt8Type              CustomInt8Type    = 3
-		mockColCustomInt16Type             CustomInt16Type   = 14083
-		mockColCustomInt32Type             CustomInt32Type   = 608169604
-		mockColCustomInt64Type             CustomInt64Type   = 608169605
-		mockColCustomFloat32Type           CustomFloat32Type = 7.599999904632568
-		mockColCustomFloat64Type           CustomFloat64Type = 9.8
-		mockColCustomUintType              CustomUintType    = 608169610
-		mockColCustomUint8Type             CustomUint8Type   = 221
-		mockColCustomUint16Type            CustomUint16Type  = 4812
-		mockColCustomUint32Type            CustomUint32Type  = 608169613
-		mockColCustomUint64Type            CustomUint64Type  = 608169614
+		mockColMapStringString                               = map[string]string{"bzBov": "WFmAc", "HWcll": "TEhle", "VSzpP": "IilfJ"}
+		mockColMapStringPtrString                            = map[string]*string{"syBkL": stringPtr("COGNS"), "RgKdp": stringPtr("nEtbz"), "kZXwm": stringPtr("arrVv")}
+		mockColMapStringInt                                  = map[string]int{"fxMpM": 2957738948002534632, "xsoju": 5243786676071560194, "qNLRA": 8718281656082008399}
+		mockColMapStringPtrInt                               = map[string]*int{"bDAPC": intPtr(421457854334528867), "aNLFn": intPtr(657801808822237928), "UlbPV": intPtr(7882030331052233079)}
+		mockColMapIntSliceString                             = map[int][]string{6812710852133740386: {"Ertad", "lImHf", "sGdYB"}, 3514875530947402435: {"eccsB", "XmUBX", "tZzAj"}, 1640979893917237826: {"hFnbG", "xkvXt", "mSYVx"}}
+		mockColMapIntPtrSliceString                          = map[int]*[]string{689832524063967629: {"vLxga", "kksuq", "yNovZ"}, 8510854009147269140: {"rLlFf", "ZmYHe", "mYlpA"}, 1855461539089785566: {"TkYHb", "RPfsc", "JrhTA"}}
+		mockColMapIntSlicePtrString                          = map[int][]*string{7796427636021573468: {stringPtr("PERcQ"), stringPtr("KXoon"), stringPtr("nRufA")}, 5170733929529154612: {stringPtr("cuvaN"), stringPtr("zfsPk"), stringPtr("bVfZv")}, 5193202225257715270: {stringPtr("JBscS"), stringPtr("PaaFD"), stringPtr("Qfsmz")}}
+		mockColMapIntPtrSlicePtrString                       = map[int]*[]*string{6772078089664917898: {stringPtr("MTsVT"), stringPtr("BGlRZ"), stringPtr("UsoEr")}, 6953897037863106182: {stringPtr("weGSP"), stringPtr("CAWxF"), stringPtr("uOuvt")}, 3645567573765657738: {stringPtr("RGvRh"), stringPtr("rmfEi"), stringPtr("xziTt")}}
+		mockColMapStringMapStringString                      = map[string]map[string]string{"LHmwP": {"kBAeK": "tQCvz", "lwRko": "yoVfJ", "SOWsn": "ptSvs"}, "kJkjn": {"HOceu": "Fqxig", "ZrtaI": "jvZWA", "TRiIM": "QimIp"}, "eJjSF": {"QaFvF": "OXmHH", "PUjDE": "VUlic", "lHJUS": "FuNfc"}}
+		mockColMapStringPtrMapStringString                   = map[string]*map[string]string{"LWQrB": {"DqAym": "rqEfA", "yuBbg": "AmEcM", "IsvID": "McxGs"}, "jraaQ": {"SVuyJ": "dhRrn", "wKFkV": "QauLK", "OKfin": "EjZwS"}, "MFkvz": {"VCwpw": "bsazL", "qPObn": "FaabD", "QlcGX": "ufZzi"}}
+		mockColSliceSliceString                              = [][]string{{"OBTld", "vIBUb", "JQlPb"}, {"eWyVF", "cljXf", "umdZs"}, {"LTJJr", "SuNsk", "ICjJX"}}
+		mockColSliceSlicePtrString                           = [][]*string{{stringPtr("ZulkY"), stringPtr("oOlhb"), stringPtr("jmPOs")}, {stringPtr("zESrm"), stringPtr("GqZYz"), stringPtr("SEICU")}, {stringPtr("FQkgr"), stringPtr("LYxuy"), stringPtr("HGpsR")}}
+		mockColArrayString                                   = [2]string{"fvsNc", "lvNgA"}
+		mockColArrayInt8ArrayPtr                             = [2]*[2]*int8{{int8Ptr(125), int8Ptr(67)}, {int8Ptr(22), int8Ptr(127)}}
+		mockColCustomIntType               CustomIntType     = 8787071967939076494
+		mockColCustomInt8Type              CustomInt8Type    = 107
+		mockColCustomInt16Type             CustomInt16Type   = 9439
+		mockColCustomInt32Type             CustomInt32Type   = 1390727781
+		mockColCustomInt64Type             CustomInt64Type   = 7308617895889833901
+		mockColCustomFloat32Type           CustomFloat32Type = 0.35669761896133423
+		mockColCustomFloat64Type           CustomFloat64Type = 0.8673022323772911
+		mockColCustomUintType              CustomUintType    = 16664198805663444872
+		mockColCustomUint8Type             CustomUint8Type   = 143
+		mockColCustomUint16Type            CustomUint16Type  = 57949
+		mockColCustomUint32Type            CustomUint32Type  = 448464110
+		mockColCustomUint64Type            CustomUint64Type  = 15820576590339358265
 		mockColCustomBoolType              CustomBoolType    = true
-		mockColCustomStringType            CustomStringType  = "l"
-		mockColCustomTimeType                                = CustomTimeType(time.Date(1988, 6, 19, 0, 0, 0, 0, time.UTC))
-		mockColCustomSliceStringType                         = CustomSliceStringType{"p"}
-		mockColSliceCustomBool                               = []CustomBoolType{true}
+		mockColCustomStringType            CustomStringType  = "szsVg"
+		mockColCustomTimeType                                = CustomTimeType(time.Date(2019, 7, 10, 10, 29, 10, 0, time.UTC))
+		mockColCustomSliceStringType                         = CustomSliceStringType{"LWPAe", "sEDFw", "nPjMd"}
+		mockColSliceCustomBool                               = []CustomBoolType{false, true, false}
 		//mockColOneOfString                                   = "one_of_a"
 		//mockColOneOfSliceTime                                = []time.Time{time.Date(2017, 4, 10, 0, 0, 0, 0, time.UTC)}
 
@@ -340,8 +346,7 @@ var _ = Describe("Randomise", func() {
 	)
 
 	BeforeEach(func() {
-		r = randomise.NewRandomise()
-		r.SetSeed(mockDate.Unix())
+		r = randomise.NewRandomise(mockDate.UnixNano())
 	})
 
 	Context("when a struct is passed with base types", func() {
@@ -581,7 +586,7 @@ var _ = Describe("Randomise", func() {
 						Provider: randomise.OneOf(optionA, optionB),
 					})
 					Expect(r.Struct(&t)).To(Succeed())
-					Expect(t.Field).To(Equal(optionB))
+					Expect(t.Field).To(Equal(optionA))
 				})
 			})
 		})
@@ -612,6 +617,20 @@ var _ = Describe("Randomise", func() {
 					Expect(r.Struct(&t)).To(Succeed())
 					Expect(t.Field).To(Equal("option_a"))
 				})
+			})
+		})
+		Describe("When string length is provided", func() {
+			type Test struct {
+				Field        string
+				DefaultField string
+			}
+
+			It("should set string length different to default", func() {
+				t := Test{}
+				r.AddTypeConfig("Field", randomise.Config{StringLength: 10})
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(len(t.Field)).To(BeNumerically("==", 10))
+				Expect(len(t.DefaultField)).To(BeNumerically("==", 5))
 			})
 		})
 	})
@@ -689,8 +708,7 @@ type NotTaggedStruct struct {
 
 func BenchmarkRandom_AddTypeProvider(b *testing.B) {
 	mockDate := time.Date(1989, 4, 10, 0, 0, 0, 0, time.UTC)
-	r := randomise.NewRandomise()
-	r.SetSeed(mockDate.Unix())
+	r := randomise.NewRandomise(mockDate.UnixNano())
 	for i := 0; i < b.N; i++ {
 		t := NotTaggedStruct{}
 		if err := r.Struct(&t); err != nil {
