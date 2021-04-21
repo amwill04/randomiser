@@ -41,5 +41,22 @@ type MalformedProviderType struct {
 }
 
 func (t MalformedProviderType) Error() string {
-	return fmt.Sprintf("randomise: field '%s' requires %v but provded value '%s' is %[3]T", t.fieldName, t.typeRequired, t.value)
+	return fmt.Sprintf("randomise: field '%s' requires %v but provded value '%v' is %[3]T", t.fieldName, t.typeRequired, t.value)
+}
+
+type MalformedProviderArgument struct {
+	message string
+}
+
+func (t MalformedProviderArgument) Error() string {
+	return t.message
+}
+
+type MalformedProviderUnsupportedType struct {
+	typeProvided reflect.Type
+	fieldName    string
+}
+
+func (t MalformedProviderUnsupportedType) Error() string {
+	return fmt.Sprintf("randomise: field '%s' has unsupported type '%s' for provider", t.fieldName, t.typeProvided)
 }

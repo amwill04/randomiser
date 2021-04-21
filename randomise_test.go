@@ -619,6 +619,87 @@ var _ = Describe("Randomise", func() {
 				})
 			})
 		})
+
+		Describe("when Between() Provider", func() {
+
+			Context("when is declared with correct type", func() {
+				type Test struct {
+					Int           int
+					IntPtr        *int
+					Int8          int8
+					Int8Ptr       *int8
+					Int16         int16
+					Int16Ptr      *int16
+					Int32         int32
+					Int32Ptr      *int32
+					Int64         int64
+					Int64Ptr      *int64
+					Time          time.Time
+					TimePtr       *time.Time
+					CustomInt     CustomIntType
+					CustomPtrInt  *CustomIntType
+					CustomTime    CustomTimeType
+					CustomPtrTime *CustomTimeType
+				}
+
+				It("it should set field", func() {
+					t := Test{}
+					r.AddTypeConfig("Int", randomise.Config{
+						Provider: randomise.Between(10, 100),
+					})
+					r.AddTypeConfig("IntPtr", randomise.Config{
+						Provider: randomise.Between(intPtr(10), intPtr(100)),
+					})
+					r.AddTypeConfig("Int8", randomise.Config{
+						Provider: randomise.Between(int8(10), int8(100)),
+					})
+					r.AddTypeConfig("Int8Ptr", randomise.Config{
+						Provider: randomise.Between(int8Ptr(10), int8Ptr(100)),
+					})
+					r.AddTypeConfig("Int16", randomise.Config{
+						Provider: randomise.Between(int16(10), int16(100)),
+					})
+					r.AddTypeConfig("Int16Ptr", randomise.Config{
+						Provider: randomise.Between(int16Ptr(10), int16Ptr(100)),
+					})
+					r.AddTypeConfig("Int32", randomise.Config{
+						Provider: randomise.Between(int32(10), int32(100)),
+					})
+					r.AddTypeConfig("Int32Ptr", randomise.Config{
+						Provider: randomise.Between(int32Ptr(10), int32Ptr(100)),
+					})
+					r.AddTypeConfig("Int64", randomise.Config{
+						Provider: randomise.Between(int64(10), int64(100)),
+					})
+					r.AddTypeConfig("Int64Ptr", randomise.Config{
+						Provider: randomise.Between(int64Ptr(10), int64Ptr(100)),
+					})
+					endMockColTime := mockColTime.AddDate(0, 0, 10)
+					r.AddTypeConfig("Time", randomise.Config{
+						Provider: randomise.Between(mockColTime, endMockColTime),
+					})
+					r.AddTypeConfig("TimePtr", randomise.Config{
+						Provider: randomise.Between(&mockColTime, &endMockColTime),
+					})
+					endMockColCustomIntType := mockColCustomIntType + 10
+					r.AddTypeConfig("CustomInt", randomise.Config{
+						Provider: randomise.Between(mockColCustomIntType, endMockColCustomIntType),
+					})
+					r.AddTypeConfig("CustomPtrInt", randomise.Config{
+						Provider: randomise.Between(&mockColCustomIntType, &endMockColCustomIntType),
+					})
+					endMockColCustomTimeType := CustomTimeType(endMockColTime)
+					r.AddTypeConfig("CustomTime", randomise.Config{
+						Provider: randomise.Between(mockColCustomTimeType, endMockColCustomTimeType),
+					})
+					r.AddTypeConfig("CustomPtrTime", randomise.Config{
+						Provider: randomise.Between(&mockColCustomTimeType, &endMockColCustomTimeType),
+					})
+					Expect(r.Struct(&t)).To(Succeed())
+				})
+			})
+		})
+
 		Describe("When string length is provided", func() {
 			type Test struct {
 				Field        string
