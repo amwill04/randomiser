@@ -1,4 +1,4 @@
-package randomise_test
+package randomiser_test
 
 import (
 	"testing"

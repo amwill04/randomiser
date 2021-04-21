@@ -1,4 +1,4 @@
-package randomise
+package randomiser
 
 import (
 	"fmt"
