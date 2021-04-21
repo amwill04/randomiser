@@ -323,26 +323,6 @@ var _ = Describe("Randomise", func() {
 		mockColCustomTimeType                                = CustomTimeType(time.Date(2019, 7, 10, 10, 29, 10, 0, time.UTC))
 		mockColCustomSliceStringType                         = CustomSliceStringType{"LWPAe", "sEDFw", "nPjMd"}
 		mockColSliceCustomBool                               = []CustomBoolType{false, true, false}
-		//mockColOneOfString                                   = "one_of_a"
-		//mockColOneOfSliceTime                                = []time.Time{time.Date(2017, 4, 10, 0, 0, 0, 0, time.UTC)}
-
-		//typeProvider = func(value reflect.Value, typ reflect.Type, _ string) error {
-		//	values := []TestTypeEnum{
-		//		TestTypeEnumValueA,
-		//		TestTypeEnumValueB,
-		//	}
-		//	v := values[rand.Intn(len(values))]
-		//	var newValue reflect.Value
-		//	if typ.Kind() == reflect.Ptr {
-		//		newType := reflect.New(typ.Elem())
-		//		newValue = reflect.ValueOf(&v).Convert(newType.Type())
-		//	} else {
-		//		newType := reflect.New(typ).Elem()
-		//		newValue = reflect.ValueOf(v).Convert(newType.Type())
-		//	}
-		//	value.Set(newValue)
-		//	return nil
-		//}
 	)
 
 	BeforeEach(func() {
@@ -571,9 +551,7 @@ var _ = Describe("Randomise", func() {
 			Context("when is declared with incorrect type", func() {
 				It("it should return MalformedProviderType", func() {
 					t := Test{}
-					r.AddTypeConfig("Field", randomise.Config{
-						Provider: randomise.OneOf("option_a", "option_b"),
-					})
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf("option_a", "option_b")))
 					err := r.Struct(&t)
 					Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
 				})
@@ -582,9 +560,7 @@ var _ = Describe("Randomise", func() {
 			Context("when is declared with correct type", func() {
 				It("it should set field", func() {
 					t := Test{}
-					r.AddTypeConfig("Field", randomise.Config{
-						Provider: randomise.OneOf(optionA, optionB),
-					})
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf(optionA, optionB)))
 					Expect(r.Struct(&t)).To(Succeed())
 					Expect(t.Field).To(Equal(optionA))
 				})
@@ -600,9 +576,7 @@ var _ = Describe("Randomise", func() {
 			Context("when is declared with incorrect type", func() {
 				It("it should return MalformedProviderType", func() {
 					t := Test{}
-					r.AddTypeConfig("Field", randomise.Config{
-						Provider: randomise.As(100),
-					})
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.As(100)))
 					err := r.Struct(&t)
 					Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
 				})
@@ -611,9 +585,7 @@ var _ = Describe("Randomise", func() {
 			Context("when is declared with correct type", func() {
 				It("it should set field", func() {
 					t := Test{}
-					r.AddTypeConfig("Field", randomise.Config{
-						Provider: randomise.As("option_a"),
-					})
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.As("option_a")))
 					Expect(r.Struct(&t)).To(Succeed())
 					Expect(t.Field).To(Equal("option_a"))
 				})
@@ -644,57 +616,25 @@ var _ = Describe("Randomise", func() {
 
 				It("it should set field", func() {
 					t := Test{}
-					r.AddTypeConfig("Int", randomise.Config{
-						Provider: randomise.Between(10, 100),
-					})
-					r.AddTypeConfig("IntPtr", randomise.Config{
-						Provider: randomise.Between(intPtr(10), intPtr(100)),
-					})
-					r.AddTypeConfig("Int8", randomise.Config{
-						Provider: randomise.Between(int8(10), int8(100)),
-					})
-					r.AddTypeConfig("Int8Ptr", randomise.Config{
-						Provider: randomise.Between(int8Ptr(10), int8Ptr(100)),
-					})
-					r.AddTypeConfig("Int16", randomise.Config{
-						Provider: randomise.Between(int16(10), int16(100)),
-					})
-					r.AddTypeConfig("Int16Ptr", randomise.Config{
-						Provider: randomise.Between(int16Ptr(10), int16Ptr(100)),
-					})
-					r.AddTypeConfig("Int32", randomise.Config{
-						Provider: randomise.Between(int32(10), int32(100)),
-					})
-					r.AddTypeConfig("Int32Ptr", randomise.Config{
-						Provider: randomise.Between(int32Ptr(10), int32Ptr(100)),
-					})
-					r.AddTypeConfig("Int64", randomise.Config{
-						Provider: randomise.Between(int64(10), int64(100)),
-					})
-					r.AddTypeConfig("Int64Ptr", randomise.Config{
-						Provider: randomise.Between(int64Ptr(10), int64Ptr(100)),
-					})
+					r.AddTypeConfig("Int", randomise.WithProvider(randomise.Between(10, 100)))
+					r.AddTypeConfig("IntPtr", randomise.WithProvider(randomise.Between(intPtr(10), intPtr(100))))
+					r.AddTypeConfig("Int8", randomise.WithProvider(randomise.Between(int8(10), int8(100))))
+					r.AddTypeConfig("Int8Ptr", randomise.WithProvider(randomise.Between(int8Ptr(10), int8Ptr(100))))
+					r.AddTypeConfig("Int16", randomise.WithProvider(randomise.Between(int16(10), int16(100))))
+					r.AddTypeConfig("Int16Ptr", randomise.WithProvider(randomise.Between(int16Ptr(10), int16Ptr(100))))
+					r.AddTypeConfig("Int32", randomise.WithProvider(randomise.Between(int32(10), int32(100))))
+					r.AddTypeConfig("Int32Ptr", randomise.WithProvider(randomise.Between(int32Ptr(10), int32Ptr(100))))
+					r.AddTypeConfig("Int64", randomise.WithProvider(randomise.Between(int64(10), int64(100))))
+					r.AddTypeConfig("Int64Ptr", randomise.WithProvider(randomise.Between(int64Ptr(10), int64Ptr(100))))
 					endMockColTime := mockColTime.AddDate(0, 0, 10)
-					r.AddTypeConfig("Time", randomise.Config{
-						Provider: randomise.Between(mockColTime, endMockColTime),
-					})
-					r.AddTypeConfig("TimePtr", randomise.Config{
-						Provider: randomise.Between(&mockColTime, &endMockColTime),
-					})
+					r.AddTypeConfig("Time", randomise.WithProvider(randomise.Between(mockColTime, endMockColTime)))
+					r.AddTypeConfig("TimePtr", randomise.WithProvider(randomise.Between(&mockColTime, &endMockColTime)))
 					endMockColCustomIntType := mockColCustomIntType + 10
-					r.AddTypeConfig("CustomInt", randomise.Config{
-						Provider: randomise.Between(mockColCustomIntType, endMockColCustomIntType),
-					})
-					r.AddTypeConfig("CustomPtrInt", randomise.Config{
-						Provider: randomise.Between(&mockColCustomIntType, &endMockColCustomIntType),
-					})
+					r.AddTypeConfig("CustomInt", randomise.WithProvider(randomise.Between(mockColCustomIntType, endMockColCustomIntType)))
+					r.AddTypeConfig("CustomPtrInt", randomise.WithProvider(randomise.Between(&mockColCustomIntType, &endMockColCustomIntType)))
 					endMockColCustomTimeType := CustomTimeType(endMockColTime)
-					r.AddTypeConfig("CustomTime", randomise.Config{
-						Provider: randomise.Between(mockColCustomTimeType, endMockColCustomTimeType),
-					})
-					r.AddTypeConfig("CustomPtrTime", randomise.Config{
-						Provider: randomise.Between(&mockColCustomTimeType, &endMockColCustomTimeType),
-					})
+					r.AddTypeConfig("CustomTime", randomise.WithProvider(randomise.Between(mockColCustomTimeType, endMockColCustomTimeType)))
+					r.AddTypeConfig("CustomPtrTime", randomise.WithProvider(randomise.Between(&mockColCustomTimeType, &endMockColCustomTimeType)))
 					Expect(r.Struct(&t)).To(Succeed())
 				})
 			})
@@ -708,10 +648,59 @@ var _ = Describe("Randomise", func() {
 
 			It("should set string length different to default", func() {
 				t := Test{}
-				r.AddTypeConfig("Field", randomise.Config{StringLength: 10})
+				r.AddTypeConfig("Field", randomise.WithStringLength(10))
 				Expect(r.Struct(&t)).To(Succeed())
 				Expect(len(t.Field)).To(BeNumerically("==", 10))
-				Expect(len(t.DefaultField)).To(BeNumerically("==", 5))
+				Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.StringLengthDefault))
+			})
+		})
+
+		Describe("When slice length is provided", func() {
+			type Test struct {
+				Field        []string
+				DefaultField []string
+			}
+
+			It("should set slice length different to default", func() {
+				t := Test{}
+				r.AddTypeConfig("Field", randomise.WithSliceLength(10))
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(len(t.Field)).To(BeNumerically("==", 10))
+				Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.SliceLengthDefault))
+			})
+		})
+
+		Describe("When map length is provided", func() {
+			type Test struct {
+				Field map[string]int
+				//DefaultField map[string]string
+			}
+
+			It("should set map length different to default", func() {
+				t := Test{}
+				r.AddTypeConfig("Field", randomise.WithMapLength(10))
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(len(t.Field)).To(BeNumerically("==", 10))
+				//Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.MapLengthDefault))
+			})
+		})
+
+		Describe("When map key length is provided", func() {
+			type Test struct {
+				Field        map[string]string
+				DefaultField map[string]string
+			}
+
+			It("should set map key different to default", func() {
+				t := Test{}
+				r.AddTypeConfig("Field", randomise.WithMapKeyLength(10))
+				Expect(r.Struct(&t)).To(Succeed())
+				for k := range t.Field {
+					Expect(len(k)).To(BeNumerically("==", 10))
+				}
+				for k := range t.DefaultField {
+					Expect(len(k)).To(BeNumerically("==", randomise.MapKeyLengthDefault))
+				}
 			})
 		})
 	})

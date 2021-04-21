@@ -13,15 +13,22 @@ var (
 	ignoreRegex = regexp.MustCompile("(\\binterface\\b)|\\bchan\\b")
 )
 
+const (
+	MapKeyLengthDefault = 5
+	MapLengthDefault    = 3
+	StringLengthDefault = 5
+	SliceLengthDefault  = 3
+)
+
 func NewRandomise(seed int64) Random {
 	rand.Seed(seed)
 	configs := make(map[string]Config)
 	defaultConfig := Config{
 		Provider:     nil,
-		MapKeyLength: 5,
-		StringLength: 5,
-		SliceLength:  3,
-		MapLength:    3,
+		MapKeyLength: MapKeyLengthDefault,
+		StringLength: StringLengthDefault,
+		SliceLength:  SliceLengthDefault,
+		MapLength:    MapLengthDefault,
 	}
 	return Random{
 		configs:        configs,
@@ -62,8 +69,50 @@ func (r *Random) SetMapKeyLength(length int) {
 	r.defaultConfig.MapKeyLength = length
 }
 
-func (r *Random) AddTypeConfig(name string, config Config) {
-	r.configs[name] = config
+type ConfigOption func(config *Config)
+
+func WithMapKeyLength(mapKeyLength int) ConfigOption {
+	return func(config *Config) {
+		config.MapKeyLength = mapKeyLength
+	}
+}
+
+func WithMapLength(mapLength int) ConfigOption {
+	return func(config *Config) {
+		config.MapLength = mapLength
+	}
+}
+
+func WithStringLength(stringLength int) ConfigOption {
+	return func(config *Config) {
+		config.StringLength = stringLength
+	}
+}
+
+func WithSliceLength(sliceLength int) ConfigOption {
+	return func(config *Config) {
+		config.SliceLength = sliceLength
+	}
+}
+
+func WithProvider(provider Provider) ConfigOption {
+	return func(config *Config) {
+		config.Provider = provider
+	}
+}
+
+func (r *Random) AddTypeConfig(name string, options ...ConfigOption) {
+	baseConfig := Config{
+		Provider:     nil,
+		MapKeyLength: MapKeyLengthDefault,
+		StringLength: StringLengthDefault,
+		SliceLength:  SliceLengthDefault,
+		MapLength:    MapLengthDefault,
+	}
+	for _, option := range options {
+		option(&baseConfig)
+	}
+	r.configs[name] = baseConfig
 }
 
 func (r *Random) Struct(dst interface{}) error {
@@ -531,7 +580,7 @@ func (r Random) randomiseMap(value reflect.Value, typ reflect.Type) error {
 		baseType = baseType.Elem()
 	}
 	mapType := reflect.MapOf(baseType.Key(), baseType.Elem())
-	newMap := reflect.MakeMap(mapType)
+	newMap := reflect.MakeMapWithSize(mapType, r.currentConfig.MapLength)
 	for i := 0; i < r.currentConfig.MapLength; i++ {
 		k := reflect.New(baseType.Key()).Elem()
 		v := reflect.New(baseType.Elem()).Elem()
