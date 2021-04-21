@@ -62,7 +62,7 @@ func (r *Random) SetSliceLength(length int) {
 }
 
 func (r *Random) SetMapLength(length int) {
-	r.defaultConfig.SliceLength = length
+	r.defaultConfig.MapLength = length
 }
 
 func (r *Random) SetMapKeyLength(length int) {

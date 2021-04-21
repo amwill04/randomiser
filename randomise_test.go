@@ -535,6 +535,35 @@ var _ = Describe("Randomise", func() {
 		})
 	})
 
+	Describe("When globals are updated", func() {
+		type Test struct {
+			FieldString string
+			FieldSlice  []string
+			FieldMap    map[string]string
+		}
+
+		Context("when when setters are called", func() {
+			It("should set all values", func() {
+				t := Test{}
+				r.SetStringLength(10)
+				r.SetMapKeyLength(5)
+				r.SetMapLength(10)
+				r.SetSliceLength(10)
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(len(t.FieldString)).To(BeNumerically("==", 10))
+				Expect(len(t.FieldMap)).To(BeNumerically("==", 10))
+				for k, v := range t.FieldMap {
+					Expect(len(k)).To(BeNumerically("==", 5))
+					Expect(len(v)).To(BeNumerically("==", 10))
+				}
+				Expect(len(t.FieldSlice)).To(BeNumerically("==", 10))
+				for _, v := range t.FieldSlice {
+					Expect(len(v)).To(BeNumerically("==", 10))
+				}
+			})
+		})
+	})
+
 	Describe("AddTypeConfig() is called", func() {
 		Describe("when OneOf() Provider", func() {
 
@@ -593,6 +622,87 @@ var _ = Describe("Randomise", func() {
 		})
 
 		Describe("when Between() Provider", func() {
+
+			Context("when field is not supported type", func() {
+				type Test struct {
+					Field string
+				}
+
+				var (
+					t Test
+				)
+
+				BeforeEach(func() {
+					t = Test{}
+				})
+
+				It("should return MalformedProviderUnsupportedType ", func() {
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between("a", "c")))
+					Expect(r.Struct(&t)).ToNot(Succeed())
+				})
+			})
+
+			Context("when  arguments are incorrect type", func() {
+				type Test struct {
+					Field int
+				}
+
+				var (
+					t Test
+				)
+
+				BeforeEach(func() {
+					t = Test{}
+				})
+
+				It("should return MalformedProviderType with first argument", func() {
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColInt8, mockColInt)))
+					Expect(r.Struct(&t)).ToNot(Succeed())
+				})
+
+				It("should return MalformedProviderType with second argument", func() {
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColInt, mockColInt8)))
+					Expect(r.Struct(&t)).ToNot(Succeed())
+				})
+			})
+
+			Context("when end < start number", func() {
+				type Test struct {
+					Field int
+				}
+
+				var (
+					t Test
+				)
+
+				BeforeEach(func() {
+					t = Test{}
+				})
+
+				It("should return MalformedProviderType", func() {
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(10, 1)))
+					Expect(r.Struct(&t)).ToNot(Succeed())
+				})
+			})
+
+			Context("when end < start time", func() {
+				type Test struct {
+					Field time.Time
+				}
+
+				var (
+					t Test
+				)
+
+				BeforeEach(func() {
+					t = Test{}
+				})
+
+				It("should return MalformedProviderType", func() {
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColTime.AddDate(0, 0, 1), mockColTime)))
+					Expect(r.Struct(&t)).ToNot(Succeed())
+				})
+			})
 
 			Context("when is declared with correct type", func() {
 				type Test struct {
