@@ -225,6 +225,18 @@ type CustomTypesPtr struct {
 }
 
 var _ = Describe("Randomise", func() {
+
+	Context("When called without using CreateNew()", func() {
+		type Test struct {
+			Field string
+		}
+		It("should return MalformedRandom", func() {
+			t := Test{}
+			rand := randomise.Random{}
+			Expect(rand.Struct(&t)).ToNot(Succeed())
+		})
+	})
+
 	var (
 		r        randomise.Random
 		mockDate = time.Date(1989, 4, 10, 0, 0, 0, 0, time.UTC)
@@ -327,6 +339,23 @@ var _ = Describe("Randomise", func() {
 
 	BeforeEach(func() {
 		r = randomise.NewRandomise(mockDate.UnixNano())
+	})
+
+	Context("When called without passing pointer", func() {
+		type Test struct {
+			Field string
+		}
+		It("should return MalformedRandom", func() {
+			t := Test{}
+			Expect(r.Struct(t)).ToNot(Succeed())
+		})
+	})
+
+	Context("when non struct type is passed", func() {
+		It("should return error", func() {
+			var test string
+			Expect(r.Struct(&test)).ToNot(Succeed())
+		})
 	})
 
 	Context("when a struct is passed with base types", func() {
@@ -886,7 +915,7 @@ type NotTaggedStruct struct {
 	IPV6             string
 }
 
-func BenchmarkRandom_AddTypeProvider(b *testing.B) {
+func BenchmarkRandom_Generate(b *testing.B) {
 	mockDate := time.Date(1989, 4, 10, 0, 0, 0, 0, time.UTC)
 	r := randomise.NewRandomise(mockDate.UnixNano())
 	for i := 0; i < b.N; i++ {
