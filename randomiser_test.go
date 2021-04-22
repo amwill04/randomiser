@@ -667,6 +667,19 @@ var _ = Describe("Randomise", func() {
 				})
 			})
 
+			Context("when is declared with value rather than pointer", func() {
+				type TestPtr struct {
+					Field *string
+				}
+
+				It("it should set field", func() {
+					t := TestPtr{}
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.As("option_a")))
+					Expect(r.Struct(&t)).To(Succeed())
+					Expect(*t.Field).To(Equal("option_a"))
+				})
+			})
+
 			Context("when is declared with correct type", func() {
 				It("it should set field", func() {
 					t := Test{}
