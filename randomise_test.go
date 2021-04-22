@@ -1,6 +1,7 @@
 package randomiser_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -355,6 +356,21 @@ var _ = Describe("Randomise", func() {
 		It("should return error", func() {
 			var test string
 			Expect(r.Struct(&test)).ToNot(Succeed())
+		})
+	})
+
+	Context("when has private fields ", func() {
+		type Test struct {
+			FieldA          string
+			FieldB          *string
+			privateField    string
+			privateFieldPtr *string
+		}
+
+		It("should not return error", func() {
+			var t = Test{}
+			Expect(r.Struct(&t)).To(Succeed())
+			fmt.Printf("%+v", t)
 		})
 	})
 

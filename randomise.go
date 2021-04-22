@@ -152,6 +152,9 @@ func (r *Random) Struct(dst interface{}) error {
 }
 
 func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *int) error {
+	if !value.CanInterface() {
+		return nil
+	}
 	switch value.Interface().(type) {
 	case int8, *int8:
 		r.randomiseInt8(value, typ)
