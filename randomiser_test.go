@@ -1,7 +1,6 @@
 package randomiser_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -370,7 +369,6 @@ var _ = Describe("Randomise", func() {
 		It("should not return error", func() {
 			var t = Test{}
 			Expect(r.Struct(&t)).To(Succeed())
-			fmt.Printf("%+v", t)
 		})
 	})
 
@@ -628,6 +626,19 @@ var _ = Describe("Randomise", func() {
 					r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf("option_a", "option_b")))
 					err := r.Struct(&t)
 					Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
+				})
+			})
+
+			Context("when is declared with value rather than pointer", func() {
+				type TestPtr struct {
+					Field *EnumType
+				}
+
+				It("it should set field", func() {
+					t := TestPtr{}
+					r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf(optionA, optionB)))
+					Expect(r.Struct(&t)).To(Succeed())
+					Expect(*t.Field).To(Equal(optionA))
 				})
 			})
 

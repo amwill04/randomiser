@@ -11,17 +11,28 @@ type Provider func(reflect.Value, reflect.Type, string) error
 
 func OneOf(values ...interface{}) Provider {
 	return func(value reflect.Value, typ reflect.Type, fieldName string) error {
+		baseType := typ
+		var isPtr bool
+		if baseType.Kind() == reflect.Ptr {
+			isPtr = true
+			baseType = baseType.Elem()
+		}
+		newValue := reflect.New(baseType)
 		v := values[rand.Int63n(int64(len(values)))]
-		var newValue reflect.Value
-		newValue = reflect.ValueOf(v)
-		if newValue.Type() != typ {
+		setValue := reflect.ValueOf(v)
+		if setValue.Type() != baseType {
 			return MalformedProviderType{
 				typeRequired: typ,
 				value:        v,
 				fieldName:    fieldName,
 			}
 		}
-		value.Set(newValue)
+		newValue.Elem().Set(setValue)
+		if isPtr {
+			value.Set(newValue)
+		} else {
+			value.Set(newValue.Elem())
+		}
 		return nil
 	}
 }
