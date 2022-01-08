@@ -151,6 +151,10 @@ func (r *Random) Struct(dst interface{}) error {
 	return nil
 }
 
+func (r *Random) String(dst *string) {
+	*dst = r.randomString(r.currentConfig.StringLength)
+}
+
 func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *int) error {
 	if !value.CanInterface() {
 		return nil

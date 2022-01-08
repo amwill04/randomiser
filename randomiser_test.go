@@ -337,552 +337,566 @@ var _ = Describe("Randomise", func() {
 		mockColSliceCustomBool                               = []CustomBoolType{false, true, false}
 	)
 
-	BeforeEach(func() {
-		r = randomise.NewRandomise(mockDate.UnixNano())
-	})
+	Describe("struct", func() {
 
-	Context("When called without passing pointer", func() {
-		type Test struct {
-			Field string
-		}
-		It("should return MalformedRandom", func() {
-			t := Test{}
-			Expect(r.Struct(t)).ToNot(Succeed())
-		})
-	})
-
-	Context("when non struct type is passed", func() {
-		It("should return error", func() {
-			var test string
-			Expect(r.Struct(&test)).ToNot(Succeed())
-		})
-	})
-
-	Context("when has private fields ", func() {
-		type Test struct {
-			FieldA          string
-			FieldB          *string
-			privateField    string
-			privateFieldPtr *string
-		}
-
-		It("should not return error", func() {
-			var t = Test{}
-			Expect(r.Struct(&t)).To(Succeed())
-		})
-	})
-
-	Context("when a struct is passed with base types", func() {
-		It("should return randomised struct", func() {
-			t := BaseTypes{}
-			Expect(r.Struct(&t)).To(Succeed())
-			Expect(t).To(Equal(BaseTypes{
-				ColInt:                         mockColInt,
-				ColInt8:                        mockColInt8,
-				ColInt16:                       mockColInt16,
-				ColInt32:                       mockColInt32,
-				ColInt64:                       mockColInt64,
-				ColFloat32:                     mockColFloat32,
-				ColFloat64:                     mockColFloat64,
-				ColUint:                        mockColUint,
-				ColUint8:                       mockColUint8,
-				ColUint16:                      mockColUint16,
-				ColUint32:                      mockColUint32,
-				ColUint64:                      mockColUint64,
-				ColBool:                        mockColBool,
-				ColString:                      mockColString,
-				ColTime:                        mockColTime,
-				ColByte:                        mockColByte,
-				ColSliceInt:                    mockColSliceInt,
-				ColSliceInt8:                   mockColSliceInt8,
-				ColSliceInt16:                  mockColSliceInt16,
-				ColSliceInt32:                  mockColSliceInt32,
-				ColSliceInt64:                  mockColSliceInt64,
-				ColSliceFloat32:                mockColSliceFloat32,
-				ColSliceFloat64:                mockColSliceFloat64,
-				ColSliceUint:                   mockColSliceUint,
-				ColSliceUint8:                  mockColSliceUint8,
-				ColSliceUint16:                 mockColSliceUint16,
-				ColSliceUint32:                 mockColSliceUint32,
-				ColSliceUint64:                 mockColSliceUint64,
-				ColSliceBool:                   mockColSliceBool,
-				ColSliceString:                 mockColSliceString,
-				ColSliceTime:                   mockColSliceTime,
-				ColPtrByte:                     mockColSlicePtrByte,
-				ColSlicePtrInt:                 mockColSlicePtrInt,
-				ColSlicePtrInt8:                mockColSlicePtrInt8,
-				ColSlicePtrInt16:               mockColSlicePtrInt16,
-				ColSlicePtrInt32:               mockColSlicePtrInt32,
-				ColSlicePtrInt64:               mockColSlicePtrInt64,
-				ColSlicePtrFloat32:             mockColSlicePtrFloat32,
-				ColSlicePtrFloat64:             mockColSlicePtrFloat64,
-				ColSlicePtrUint:                mockColSlicePtrUint,
-				ColSlicePtrUint8:               mockColSlicePtrUint8,
-				ColSlicePtrUint16:              mockColSlicePtrUint16,
-				ColSlicePtrUint32:              mockColSlicePtrUint32,
-				ColSlicePtrUint64:              mockColSlicePtrUint64,
-				ColSlicePtrBool:                mockColSlicePtrBool,
-				ColSlicePtrString:              mockColSlicePtrString,
-				ColSlicePtrTime:                mockColSlicePtrTime,
-				ColStruct:                      mockColStruct,
-				ColMapStringString:             mockColMapStringString,
-				ColMapStringPtrString:          mockColMapStringPtrString,
-				ColMapStringInt:                mockColMapStringInt,
-				ColMapStringPtrInt:             mockColMapStringPtrInt,
-				ColMapIntSliceString:           mockColMapIntSliceString,
-				ColMapIntPtrSliceString:        mockColMapIntPtrSliceString,
-				ColMapIntSlicePtrString:        mockColMapIntSlicePtrString,
-				ColMapIntPtrSlicePtrString:     mockColMapIntPtrSlicePtrString,
-				ColMapStringMapStringString:    mockColMapStringMapStringString,
-				ColMapStringPtrMapStringString: mockColMapStringPtrMapStringString,
-				ColSliceSliceString:            mockColSliceSliceString,
-				ColSliceSlicePtrString:         mockColSliceSlicePtrString,
-				ColInterface:                   nil,
-				ColSliceInterface:              nil,
-				ColMapStringInterface:          nil,
-				ColArrayString:                 mockColArrayString,
-				ColArrayArrayInt8Ptr:           mockColArrayInt8ArrayPtr,
-				ColChanString:                  nil,
-				ColSliceChanString:             nil,
-			}))
-		})
-	})
-
-	Context("when a struct is passed with base types as pointers", func() {
-		It("should return randomised struct", func() {
-			t := BaseTypesPtr{}
-			Expect(r.Struct(&t)).To(Succeed())
-			Expect(t).To(Equal(BaseTypesPtr{
-				ColInt:                         &mockColInt,
-				ColInt8:                        &mockColInt8,
-				ColInt16:                       &mockColInt16,
-				ColInt32:                       &mockColInt32,
-				ColInt64:                       &mockColInt64,
-				ColFloat32:                     &mockColFloat32,
-				ColFloat64:                     &mockColFloat64,
-				ColUint:                        &mockColUint,
-				ColUint8:                       &mockColUint8,
-				ColUint16:                      &mockColUint16,
-				ColUint32:                      &mockColUint32,
-				ColUint64:                      &mockColUint64,
-				ColBool:                        &mockColBool,
-				ColString:                      &mockColString,
-				ColTime:                        &mockColTime,
-				ColByte:                        &mockColByte,
-				ColSliceInt:                    &mockColSliceInt,
-				ColSliceInt8:                   &mockColSliceInt8,
-				ColSliceInt16:                  &mockColSliceInt16,
-				ColSliceInt32:                  &mockColSliceInt32,
-				ColSliceInt64:                  &mockColSliceInt64,
-				ColSliceFloat32:                &mockColSliceFloat32,
-				ColSliceFloat64:                &mockColSliceFloat64,
-				ColSliceUint:                   &mockColSliceUint,
-				ColSliceUint8:                  &mockColSliceUint8,
-				ColSliceUint16:                 &mockColSliceUint16,
-				ColSliceUint32:                 &mockColSliceUint32,
-				ColSliceUint64:                 &mockColSliceUint64,
-				ColSliceBool:                   &mockColSliceBool,
-				ColSliceString:                 &mockColSliceString,
-				ColSliceTime:                   &mockColSliceTime,
-				ColPtrByte:                     &mockColSlicePtrByte,
-				ColSlicePtrInt:                 &mockColSlicePtrInt,
-				ColSlicePtrInt8:                &mockColSlicePtrInt8,
-				ColSlicePtrInt16:               &mockColSlicePtrInt16,
-				ColSlicePtrInt32:               &mockColSlicePtrInt32,
-				ColSlicePtrInt64:               &mockColSlicePtrInt64,
-				ColSlicePtrFloat32:             &mockColSlicePtrFloat32,
-				ColSlicePtrFloat64:             &mockColSlicePtrFloat64,
-				ColSlicePtrUint:                &mockColSlicePtrUint,
-				ColSlicePtrUint8:               &mockColSlicePtrUint8,
-				ColSlicePtrUint16:              &mockColSlicePtrUint16,
-				ColSlicePtrUint32:              &mockColSlicePtrUint32,
-				ColSlicePtrUint64:              &mockColSlicePtrUint64,
-				ColSlicePtrBool:                &mockColSlicePtrBool,
-				ColSlicePtrString:              &mockColSlicePtrString,
-				ColSlicePtrTime:                &mockColSlicePtrTime,
-				ColStruct:                      &mockColStruct,
-				ColMapStringString:             &mockColMapStringString,
-				ColMapStringPtrString:          &mockColMapStringPtrString,
-				ColMapStringInt:                &mockColMapStringInt,
-				ColMapStringPtrInt:             &mockColMapStringPtrInt,
-				ColMapIntSliceString:           &mockColMapIntSliceString,
-				ColMapIntPtrSliceString:        &mockColMapIntPtrSliceString,
-				ColMapIntSlicePtrString:        &mockColMapIntSlicePtrString,
-				ColMapIntPtrSlicePtrString:     &mockColMapIntPtrSlicePtrString,
-				ColMapStringMapStringString:    &mockColMapStringMapStringString,
-				ColMapStringPtrMapStringString: &mockColMapStringPtrMapStringString,
-				ColSliceSliceString:            &mockColSliceSliceString,
-				ColSliceSlicePtrString:         &mockColSliceSlicePtrString,
-				ColInterface:                   nil,
-				ColSliceInterface:              nil,
-				ColMapStringInterface:          nil,
-				ColArrayString:                 &mockColArrayString,
-				ColArrayArrayInt8Ptr:           &mockColArrayInt8ArrayPtr,
-				ColChanString:                  nil,
-				ColSliceChanString:             nil,
-			}))
-		})
-	})
-
-	Describe("custom types", func() {
-		Context("non-pointers", func() {
-			It("should return randomised struct", func() {
-				t := CustomTypes{}
-				Expect(r.Struct(&t)).To(Succeed())
-				Expect(t).To(Equal(CustomTypes{
-					ColCustomIntType:         mockColCustomIntType,
-					ColCustomInt8Type:        mockColCustomInt8Type,
-					ColCustomInt16Type:       mockColCustomInt16Type,
-					ColCustomInt32Type:       mockColCustomInt32Type,
-					ColCustomInt64Type:       mockColCustomInt64Type,
-					ColCustomFloat32Type:     mockColCustomFloat32Type,
-					ColCustomFloat64Type:     mockColCustomFloat64Type,
-					ColCustomUintType:        mockColCustomUintType,
-					ColCustomUint8Type:       mockColCustomUint8Type,
-					ColCustomUint16Type:      mockColCustomUint16Type,
-					ColCustomUint32Type:      mockColCustomUint32Type,
-					ColCustomUint64Type:      mockColCustomUint64Type,
-					ColCustomBoolType:        mockColCustomBoolType,
-					ColCustomStringType:      mockColCustomStringType,
-					ColCustomTimeType:        mockColCustomTimeType,
-					ColCustomSliceStringType: mockColCustomSliceStringType,
-					ColSliceCustomBool:       mockColSliceCustomBool,
-				}))
-			})
-		})
-	})
-
-	Context("pointers", func() {
-		It("should return randomised struct", func() {
-			t := CustomTypesPtr{}
-			Expect(r.Struct(&t)).To(Succeed())
-			Expect(t).To(Equal(CustomTypesPtr{
-				ColCustomIntType:         &mockColCustomIntType,
-				ColCustomInt8Type:        &mockColCustomInt8Type,
-				ColCustomInt16Type:       &mockColCustomInt16Type,
-				ColCustomInt32Type:       &mockColCustomInt32Type,
-				ColCustomInt64Type:       &mockColCustomInt64Type,
-				ColCustomFloat32Type:     &mockColCustomFloat32Type,
-				ColCustomFloat64Type:     &mockColCustomFloat64Type,
-				ColCustomUintType:        &mockColCustomUintType,
-				ColCustomUint8Type:       &mockColCustomUint8Type,
-				ColCustomUint16Type:      &mockColCustomUint16Type,
-				ColCustomUint32Type:      &mockColCustomUint32Type,
-				ColCustomUint64Type:      &mockColCustomUint64Type,
-				ColCustomBoolType:        &mockColCustomBoolType,
-				ColCustomStringType:      &mockColCustomStringType,
-				ColCustomTimeType:        &mockColCustomTimeType,
-				ColCustomSliceStringType: &mockColCustomSliceStringType,
-				ColSliceCustomBool:       &mockColSliceCustomBool,
-			}))
-		})
-	})
-
-	Describe("When globals are updated", func() {
-		type Test struct {
-			FieldString string
-			FieldSlice  []string
-			FieldMap    map[string]string
-		}
-
-		Context("when when setters are called", func() {
-			It("should set all values", func() {
-				t := Test{}
-				r.SetStringLength(10)
-				r.SetMapKeyLength(5)
-				r.SetMapLength(10)
-				r.SetSliceLength(10)
-				Expect(r.Struct(&t)).To(Succeed())
-				Expect(len(t.FieldString)).To(BeNumerically("==", 10))
-				Expect(len(t.FieldMap)).To(BeNumerically("==", 10))
-				for k, v := range t.FieldMap {
-					Expect(len(k)).To(BeNumerically("==", 5))
-					Expect(len(v)).To(BeNumerically("==", 10))
-				}
-				Expect(len(t.FieldSlice)).To(BeNumerically("==", 10))
-				for _, v := range t.FieldSlice {
-					Expect(len(v)).To(BeNumerically("==", 10))
-				}
-			})
-		})
-	})
-
-	Describe("AddTypeConfig() is called", func() {
-		Describe("when OneOf() Provider", func() {
-
-			type EnumType string
-			type Test struct {
-				Field EnumType
-			}
-
-			var (
-				optionA = EnumType("option_a")
-				optionB = EnumType("option_b")
-			)
-
-			Context("when is declared with incorrect type", func() {
-				It("it should return MalformedProviderType", func() {
-					t := Test{}
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf("option_a", "option_b")))
-					err := r.Struct(&t)
-					Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
-				})
-			})
-
-			Context("when is declared with value rather than pointer", func() {
-				type TestPtr struct {
-					Field *EnumType
-				}
-
-				It("it should set field", func() {
-					t := TestPtr{}
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf(optionA, optionB)))
-					Expect(r.Struct(&t)).To(Succeed())
-					Expect(*t.Field).To(Equal(optionA))
-				})
-			})
-
-			Context("when is declared with correct type", func() {
-				It("it should set field", func() {
-					t := Test{}
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf(optionA, optionB)))
-					Expect(r.Struct(&t)).To(Succeed())
-					Expect(t.Field).To(Equal(optionA))
-				})
-			})
+		BeforeEach(func() {
+			r = randomise.NewRandomise(mockDate.UnixNano())
 		})
 
-		Describe("when As() Provider", func() {
-
+		Context("When called without passing pointer", func() {
 			type Test struct {
 				Field string
 			}
-
-			Context("when is declared with incorrect type", func() {
-				It("it should return MalformedProviderType", func() {
-					t := Test{}
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.As(100)))
-					err := r.Struct(&t)
-					Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
-				})
+			It("should return MalformedRandom", func() {
+				t := Test{}
+				Expect(r.Struct(t)).ToNot(Succeed())
 			})
+		})
 
-			Context("when is declared with value rather than pointer", func() {
-				type TestPtr struct {
-					Field *string
-				}
-
-				It("it should set field", func() {
-					t := TestPtr{}
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.As("option_a")))
-					Expect(r.Struct(&t)).To(Succeed())
-					Expect(*t.Field).To(Equal("option_a"))
-				})
+		Context("when non struct type is passed", func() {
+			It("should return error", func() {
+				var test string
+				Expect(r.Struct(&test)).ToNot(Succeed())
 			})
+		})
 
-			Context("when is declared with correct type", func() {
-				It("it should set field", func() {
-					t := Test{}
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.As("option_a")))
+		Context("when has private fields ", func() {
+			type Test struct {
+				FieldA          string
+				FieldB          *string
+				privateField    string
+				privateFieldPtr *string
+			}
+
+			It("should not return error", func() {
+				var t = Test{}
+				Expect(r.Struct(&t)).To(Succeed())
+			})
+		})
+
+		Context("when a struct is passed with base types", func() {
+			It("should return randomised struct", func() {
+				t := BaseTypes{}
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(t).To(Equal(BaseTypes{
+					ColInt:                         mockColInt,
+					ColInt8:                        mockColInt8,
+					ColInt16:                       mockColInt16,
+					ColInt32:                       mockColInt32,
+					ColInt64:                       mockColInt64,
+					ColFloat32:                     mockColFloat32,
+					ColFloat64:                     mockColFloat64,
+					ColUint:                        mockColUint,
+					ColUint8:                       mockColUint8,
+					ColUint16:                      mockColUint16,
+					ColUint32:                      mockColUint32,
+					ColUint64:                      mockColUint64,
+					ColBool:                        mockColBool,
+					ColString:                      mockColString,
+					ColTime:                        mockColTime,
+					ColByte:                        mockColByte,
+					ColSliceInt:                    mockColSliceInt,
+					ColSliceInt8:                   mockColSliceInt8,
+					ColSliceInt16:                  mockColSliceInt16,
+					ColSliceInt32:                  mockColSliceInt32,
+					ColSliceInt64:                  mockColSliceInt64,
+					ColSliceFloat32:                mockColSliceFloat32,
+					ColSliceFloat64:                mockColSliceFloat64,
+					ColSliceUint:                   mockColSliceUint,
+					ColSliceUint8:                  mockColSliceUint8,
+					ColSliceUint16:                 mockColSliceUint16,
+					ColSliceUint32:                 mockColSliceUint32,
+					ColSliceUint64:                 mockColSliceUint64,
+					ColSliceBool:                   mockColSliceBool,
+					ColSliceString:                 mockColSliceString,
+					ColSliceTime:                   mockColSliceTime,
+					ColPtrByte:                     mockColSlicePtrByte,
+					ColSlicePtrInt:                 mockColSlicePtrInt,
+					ColSlicePtrInt8:                mockColSlicePtrInt8,
+					ColSlicePtrInt16:               mockColSlicePtrInt16,
+					ColSlicePtrInt32:               mockColSlicePtrInt32,
+					ColSlicePtrInt64:               mockColSlicePtrInt64,
+					ColSlicePtrFloat32:             mockColSlicePtrFloat32,
+					ColSlicePtrFloat64:             mockColSlicePtrFloat64,
+					ColSlicePtrUint:                mockColSlicePtrUint,
+					ColSlicePtrUint8:               mockColSlicePtrUint8,
+					ColSlicePtrUint16:              mockColSlicePtrUint16,
+					ColSlicePtrUint32:              mockColSlicePtrUint32,
+					ColSlicePtrUint64:              mockColSlicePtrUint64,
+					ColSlicePtrBool:                mockColSlicePtrBool,
+					ColSlicePtrString:              mockColSlicePtrString,
+					ColSlicePtrTime:                mockColSlicePtrTime,
+					ColStruct:                      mockColStruct,
+					ColMapStringString:             mockColMapStringString,
+					ColMapStringPtrString:          mockColMapStringPtrString,
+					ColMapStringInt:                mockColMapStringInt,
+					ColMapStringPtrInt:             mockColMapStringPtrInt,
+					ColMapIntSliceString:           mockColMapIntSliceString,
+					ColMapIntPtrSliceString:        mockColMapIntPtrSliceString,
+					ColMapIntSlicePtrString:        mockColMapIntSlicePtrString,
+					ColMapIntPtrSlicePtrString:     mockColMapIntPtrSlicePtrString,
+					ColMapStringMapStringString:    mockColMapStringMapStringString,
+					ColMapStringPtrMapStringString: mockColMapStringPtrMapStringString,
+					ColSliceSliceString:            mockColSliceSliceString,
+					ColSliceSlicePtrString:         mockColSliceSlicePtrString,
+					ColInterface:                   nil,
+					ColSliceInterface:              nil,
+					ColMapStringInterface:          nil,
+					ColArrayString:                 mockColArrayString,
+					ColArrayArrayInt8Ptr:           mockColArrayInt8ArrayPtr,
+					ColChanString:                  nil,
+					ColSliceChanString:             nil,
+				}))
+			})
+		})
+
+		Context("when a struct is passed with base types as pointers", func() {
+			It("should return randomised struct", func() {
+				t := BaseTypesPtr{}
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(t).To(Equal(BaseTypesPtr{
+					ColInt:                         &mockColInt,
+					ColInt8:                        &mockColInt8,
+					ColInt16:                       &mockColInt16,
+					ColInt32:                       &mockColInt32,
+					ColInt64:                       &mockColInt64,
+					ColFloat32:                     &mockColFloat32,
+					ColFloat64:                     &mockColFloat64,
+					ColUint:                        &mockColUint,
+					ColUint8:                       &mockColUint8,
+					ColUint16:                      &mockColUint16,
+					ColUint32:                      &mockColUint32,
+					ColUint64:                      &mockColUint64,
+					ColBool:                        &mockColBool,
+					ColString:                      &mockColString,
+					ColTime:                        &mockColTime,
+					ColByte:                        &mockColByte,
+					ColSliceInt:                    &mockColSliceInt,
+					ColSliceInt8:                   &mockColSliceInt8,
+					ColSliceInt16:                  &mockColSliceInt16,
+					ColSliceInt32:                  &mockColSliceInt32,
+					ColSliceInt64:                  &mockColSliceInt64,
+					ColSliceFloat32:                &mockColSliceFloat32,
+					ColSliceFloat64:                &mockColSliceFloat64,
+					ColSliceUint:                   &mockColSliceUint,
+					ColSliceUint8:                  &mockColSliceUint8,
+					ColSliceUint16:                 &mockColSliceUint16,
+					ColSliceUint32:                 &mockColSliceUint32,
+					ColSliceUint64:                 &mockColSliceUint64,
+					ColSliceBool:                   &mockColSliceBool,
+					ColSliceString:                 &mockColSliceString,
+					ColSliceTime:                   &mockColSliceTime,
+					ColPtrByte:                     &mockColSlicePtrByte,
+					ColSlicePtrInt:                 &mockColSlicePtrInt,
+					ColSlicePtrInt8:                &mockColSlicePtrInt8,
+					ColSlicePtrInt16:               &mockColSlicePtrInt16,
+					ColSlicePtrInt32:               &mockColSlicePtrInt32,
+					ColSlicePtrInt64:               &mockColSlicePtrInt64,
+					ColSlicePtrFloat32:             &mockColSlicePtrFloat32,
+					ColSlicePtrFloat64:             &mockColSlicePtrFloat64,
+					ColSlicePtrUint:                &mockColSlicePtrUint,
+					ColSlicePtrUint8:               &mockColSlicePtrUint8,
+					ColSlicePtrUint16:              &mockColSlicePtrUint16,
+					ColSlicePtrUint32:              &mockColSlicePtrUint32,
+					ColSlicePtrUint64:              &mockColSlicePtrUint64,
+					ColSlicePtrBool:                &mockColSlicePtrBool,
+					ColSlicePtrString:              &mockColSlicePtrString,
+					ColSlicePtrTime:                &mockColSlicePtrTime,
+					ColStruct:                      &mockColStruct,
+					ColMapStringString:             &mockColMapStringString,
+					ColMapStringPtrString:          &mockColMapStringPtrString,
+					ColMapStringInt:                &mockColMapStringInt,
+					ColMapStringPtrInt:             &mockColMapStringPtrInt,
+					ColMapIntSliceString:           &mockColMapIntSliceString,
+					ColMapIntPtrSliceString:        &mockColMapIntPtrSliceString,
+					ColMapIntSlicePtrString:        &mockColMapIntSlicePtrString,
+					ColMapIntPtrSlicePtrString:     &mockColMapIntPtrSlicePtrString,
+					ColMapStringMapStringString:    &mockColMapStringMapStringString,
+					ColMapStringPtrMapStringString: &mockColMapStringPtrMapStringString,
+					ColSliceSliceString:            &mockColSliceSliceString,
+					ColSliceSlicePtrString:         &mockColSliceSlicePtrString,
+					ColInterface:                   nil,
+					ColSliceInterface:              nil,
+					ColMapStringInterface:          nil,
+					ColArrayString:                 &mockColArrayString,
+					ColArrayArrayInt8Ptr:           &mockColArrayInt8ArrayPtr,
+					ColChanString:                  nil,
+					ColSliceChanString:             nil,
+				}))
+			})
+		})
+
+		Describe("custom types", func() {
+			Context("non-pointers", func() {
+				It("should return randomised struct", func() {
+					t := CustomTypes{}
 					Expect(r.Struct(&t)).To(Succeed())
-					Expect(t.Field).To(Equal("option_a"))
+					Expect(t).To(Equal(CustomTypes{
+						ColCustomIntType:         mockColCustomIntType,
+						ColCustomInt8Type:        mockColCustomInt8Type,
+						ColCustomInt16Type:       mockColCustomInt16Type,
+						ColCustomInt32Type:       mockColCustomInt32Type,
+						ColCustomInt64Type:       mockColCustomInt64Type,
+						ColCustomFloat32Type:     mockColCustomFloat32Type,
+						ColCustomFloat64Type:     mockColCustomFloat64Type,
+						ColCustomUintType:        mockColCustomUintType,
+						ColCustomUint8Type:       mockColCustomUint8Type,
+						ColCustomUint16Type:      mockColCustomUint16Type,
+						ColCustomUint32Type:      mockColCustomUint32Type,
+						ColCustomUint64Type:      mockColCustomUint64Type,
+						ColCustomBoolType:        mockColCustomBoolType,
+						ColCustomStringType:      mockColCustomStringType,
+						ColCustomTimeType:        mockColCustomTimeType,
+						ColCustomSliceStringType: mockColCustomSliceStringType,
+						ColSliceCustomBool:       mockColSliceCustomBool,
+					}))
 				})
 			})
 		})
 
-		Describe("when Between() Provider", func() {
+		Context("pointers", func() {
+			It("should return randomised struct", func() {
+				t := CustomTypesPtr{}
+				Expect(r.Struct(&t)).To(Succeed())
+				Expect(t).To(Equal(CustomTypesPtr{
+					ColCustomIntType:         &mockColCustomIntType,
+					ColCustomInt8Type:        &mockColCustomInt8Type,
+					ColCustomInt16Type:       &mockColCustomInt16Type,
+					ColCustomInt32Type:       &mockColCustomInt32Type,
+					ColCustomInt64Type:       &mockColCustomInt64Type,
+					ColCustomFloat32Type:     &mockColCustomFloat32Type,
+					ColCustomFloat64Type:     &mockColCustomFloat64Type,
+					ColCustomUintType:        &mockColCustomUintType,
+					ColCustomUint8Type:       &mockColCustomUint8Type,
+					ColCustomUint16Type:      &mockColCustomUint16Type,
+					ColCustomUint32Type:      &mockColCustomUint32Type,
+					ColCustomUint64Type:      &mockColCustomUint64Type,
+					ColCustomBoolType:        &mockColCustomBoolType,
+					ColCustomStringType:      &mockColCustomStringType,
+					ColCustomTimeType:        &mockColCustomTimeType,
+					ColCustomSliceStringType: &mockColCustomSliceStringType,
+					ColSliceCustomBool:       &mockColSliceCustomBool,
+				}))
+			})
+		})
 
-			Context("when field is not supported type", func() {
+		Describe("When globals are updated", func() {
+			type Test struct {
+				FieldString string
+				FieldSlice  []string
+				FieldMap    map[string]string
+			}
+
+			Context("when when setters are called", func() {
+				It("should set all values", func() {
+					t := Test{}
+					r.SetStringLength(10)
+					r.SetMapKeyLength(5)
+					r.SetMapLength(10)
+					r.SetSliceLength(10)
+					Expect(r.Struct(&t)).To(Succeed())
+					Expect(len(t.FieldString)).To(BeNumerically("==", 10))
+					Expect(len(t.FieldMap)).To(BeNumerically("==", 10))
+					for k, v := range t.FieldMap {
+						Expect(len(k)).To(BeNumerically("==", 5))
+						Expect(len(v)).To(BeNumerically("==", 10))
+					}
+					Expect(len(t.FieldSlice)).To(BeNumerically("==", 10))
+					for _, v := range t.FieldSlice {
+						Expect(len(v)).To(BeNumerically("==", 10))
+					}
+				})
+			})
+		})
+
+		Describe("AddTypeConfig() is called", func() {
+			Describe("when OneOf() Provider", func() {
+
+				type EnumType string
+				type Test struct {
+					Field EnumType
+				}
+
+				var (
+					optionA = EnumType("option_a")
+					optionB = EnumType("option_b")
+				)
+
+				Context("when is declared with incorrect type", func() {
+					It("it should return MalformedProviderType", func() {
+						t := Test{}
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf("option_a", "option_b")))
+						err := r.Struct(&t)
+						Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
+					})
+				})
+
+				Context("when is declared with value rather than pointer", func() {
+					type TestPtr struct {
+						Field *EnumType
+					}
+
+					It("it should set field", func() {
+						t := TestPtr{}
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf(optionA, optionB)))
+						Expect(r.Struct(&t)).To(Succeed())
+						Expect(*t.Field).To(Equal(optionA))
+					})
+				})
+
+				Context("when is declared with correct type", func() {
+					It("it should set field", func() {
+						t := Test{}
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.OneOf(optionA, optionB)))
+						Expect(r.Struct(&t)).To(Succeed())
+						Expect(t.Field).To(Equal(optionA))
+					})
+				})
+			})
+
+			Describe("when As() Provider", func() {
+
 				type Test struct {
 					Field string
 				}
 
-				var (
-					t Test
-				)
-
-				BeforeEach(func() {
-					t = Test{}
+				Context("when is declared with incorrect type", func() {
+					It("it should return MalformedProviderType", func() {
+						t := Test{}
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.As(100)))
+						err := r.Struct(&t)
+						Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
+					})
 				})
 
-				It("should return MalformedProviderUnsupportedType ", func() {
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between("a", "c")))
-					Expect(r.Struct(&t)).ToNot(Succeed())
-				})
-			})
+				Context("when is declared with value rather than pointer", func() {
+					type TestPtr struct {
+						Field *string
+					}
 
-			Context("when  arguments are incorrect type", func() {
-				type Test struct {
-					Field int
-				}
-
-				var (
-					t Test
-				)
-
-				BeforeEach(func() {
-					t = Test{}
+					It("it should set field", func() {
+						t := TestPtr{}
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.As("option_a")))
+						Expect(r.Struct(&t)).To(Succeed())
+						Expect(*t.Field).To(Equal("option_a"))
+					})
 				})
 
-				It("should return MalformedProviderType with first argument", func() {
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColInt8, mockColInt)))
-					Expect(r.Struct(&t)).ToNot(Succeed())
-				})
-
-				It("should return MalformedProviderType with second argument", func() {
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColInt, mockColInt8)))
-					Expect(r.Struct(&t)).ToNot(Succeed())
+				Context("when is declared with correct type", func() {
+					It("it should set field", func() {
+						t := Test{}
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.As("option_a")))
+						Expect(r.Struct(&t)).To(Succeed())
+						Expect(t.Field).To(Equal("option_a"))
+					})
 				})
 			})
 
-			Context("when end < start number", func() {
-				type Test struct {
-					Field int
-				}
+			Describe("when Between() Provider", func() {
 
-				var (
-					t Test
-				)
+				Context("when field is not supported type", func() {
+					type Test struct {
+						Field string
+					}
 
-				BeforeEach(func() {
-					t = Test{}
+					var (
+						t Test
+					)
+
+					BeforeEach(func() {
+						t = Test{}
+					})
+
+					It("should return MalformedProviderUnsupportedType ", func() {
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between("a", "c")))
+						Expect(r.Struct(&t)).ToNot(Succeed())
+					})
 				})
 
-				It("should return MalformedProviderType", func() {
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(10, 1)))
-					Expect(r.Struct(&t)).ToNot(Succeed())
+				Context("when  arguments are incorrect type", func() {
+					type Test struct {
+						Field int
+					}
+
+					var (
+						t Test
+					)
+
+					BeforeEach(func() {
+						t = Test{}
+					})
+
+					It("should return MalformedProviderType with first argument", func() {
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColInt8, mockColInt)))
+						Expect(r.Struct(&t)).ToNot(Succeed())
+					})
+
+					It("should return MalformedProviderType with second argument", func() {
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColInt, mockColInt8)))
+						Expect(r.Struct(&t)).ToNot(Succeed())
+					})
+				})
+
+				Context("when end < start number", func() {
+					type Test struct {
+						Field int
+					}
+
+					var (
+						t Test
+					)
+
+					BeforeEach(func() {
+						t = Test{}
+					})
+
+					It("should return MalformedProviderType", func() {
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(10, 1)))
+						Expect(r.Struct(&t)).ToNot(Succeed())
+					})
+				})
+
+				Context("when end < start time", func() {
+					type Test struct {
+						Field time.Time
+					}
+
+					var (
+						t Test
+					)
+
+					BeforeEach(func() {
+						t = Test{}
+					})
+
+					It("should return MalformedProviderType", func() {
+						r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColTime.AddDate(0, 0, 1), mockColTime)))
+						Expect(r.Struct(&t)).ToNot(Succeed())
+					})
+				})
+
+				Context("when is declared with correct type", func() {
+					type Test struct {
+						Int           int
+						IntPtr        *int
+						Int8          int8
+						Int8Ptr       *int8
+						Int16         int16
+						Int16Ptr      *int16
+						Int32         int32
+						Int32Ptr      *int32
+						Int64         int64
+						Int64Ptr      *int64
+						Time          time.Time
+						TimePtr       *time.Time
+						CustomInt     CustomIntType
+						CustomPtrInt  *CustomIntType
+						CustomTime    CustomTimeType
+						CustomPtrTime *CustomTimeType
+					}
+
+					It("it should set field", func() {
+						t := Test{}
+						r.AddTypeConfig("Int", randomise.WithProvider(randomise.Between(10, 100)))
+						r.AddTypeConfig("IntPtr", randomise.WithProvider(randomise.Between(intPtr(10), intPtr(100))))
+						r.AddTypeConfig("Int8", randomise.WithProvider(randomise.Between(int8(10), int8(100))))
+						r.AddTypeConfig("Int8Ptr", randomise.WithProvider(randomise.Between(int8Ptr(10), int8Ptr(100))))
+						r.AddTypeConfig("Int16", randomise.WithProvider(randomise.Between(int16(10), int16(100))))
+						r.AddTypeConfig("Int16Ptr", randomise.WithProvider(randomise.Between(int16Ptr(10), int16Ptr(100))))
+						r.AddTypeConfig("Int32", randomise.WithProvider(randomise.Between(int32(10), int32(100))))
+						r.AddTypeConfig("Int32Ptr", randomise.WithProvider(randomise.Between(int32Ptr(10), int32Ptr(100))))
+						r.AddTypeConfig("Int64", randomise.WithProvider(randomise.Between(int64(10), int64(100))))
+						r.AddTypeConfig("Int64Ptr", randomise.WithProvider(randomise.Between(int64Ptr(10), int64Ptr(100))))
+						endMockColTime := mockColTime.AddDate(0, 0, 10)
+						r.AddTypeConfig("Time", randomise.WithProvider(randomise.Between(mockColTime, endMockColTime)))
+						r.AddTypeConfig("TimePtr", randomise.WithProvider(randomise.Between(&mockColTime, &endMockColTime)))
+						endMockColCustomIntType := mockColCustomIntType + 10
+						r.AddTypeConfig("CustomInt", randomise.WithProvider(randomise.Between(mockColCustomIntType, endMockColCustomIntType)))
+						r.AddTypeConfig("CustomPtrInt", randomise.WithProvider(randomise.Between(&mockColCustomIntType, &endMockColCustomIntType)))
+						endMockColCustomTimeType := CustomTimeType(endMockColTime)
+						r.AddTypeConfig("CustomTime", randomise.WithProvider(randomise.Between(mockColCustomTimeType, endMockColCustomTimeType)))
+						r.AddTypeConfig("CustomPtrTime", randomise.WithProvider(randomise.Between(&mockColCustomTimeType, &endMockColCustomTimeType)))
+						Expect(r.Struct(&t)).To(Succeed())
+					})
 				})
 			})
 
-			Context("when end < start time", func() {
+			Describe("When string length is provided", func() {
 				type Test struct {
-					Field time.Time
+					Field        string
+					DefaultField string
 				}
 
-				var (
-					t Test
-				)
-
-				BeforeEach(func() {
-					t = Test{}
-				})
-
-				It("should return MalformedProviderType", func() {
-					r.AddTypeConfig("Field", randomise.WithProvider(randomise.Between(mockColTime.AddDate(0, 0, 1), mockColTime)))
-					Expect(r.Struct(&t)).ToNot(Succeed())
-				})
-			})
-
-			Context("when is declared with correct type", func() {
-				type Test struct {
-					Int           int
-					IntPtr        *int
-					Int8          int8
-					Int8Ptr       *int8
-					Int16         int16
-					Int16Ptr      *int16
-					Int32         int32
-					Int32Ptr      *int32
-					Int64         int64
-					Int64Ptr      *int64
-					Time          time.Time
-					TimePtr       *time.Time
-					CustomInt     CustomIntType
-					CustomPtrInt  *CustomIntType
-					CustomTime    CustomTimeType
-					CustomPtrTime *CustomTimeType
-				}
-
-				It("it should set field", func() {
+				It("should set string length different to default", func() {
 					t := Test{}
-					r.AddTypeConfig("Int", randomise.WithProvider(randomise.Between(10, 100)))
-					r.AddTypeConfig("IntPtr", randomise.WithProvider(randomise.Between(intPtr(10), intPtr(100))))
-					r.AddTypeConfig("Int8", randomise.WithProvider(randomise.Between(int8(10), int8(100))))
-					r.AddTypeConfig("Int8Ptr", randomise.WithProvider(randomise.Between(int8Ptr(10), int8Ptr(100))))
-					r.AddTypeConfig("Int16", randomise.WithProvider(randomise.Between(int16(10), int16(100))))
-					r.AddTypeConfig("Int16Ptr", randomise.WithProvider(randomise.Between(int16Ptr(10), int16Ptr(100))))
-					r.AddTypeConfig("Int32", randomise.WithProvider(randomise.Between(int32(10), int32(100))))
-					r.AddTypeConfig("Int32Ptr", randomise.WithProvider(randomise.Between(int32Ptr(10), int32Ptr(100))))
-					r.AddTypeConfig("Int64", randomise.WithProvider(randomise.Between(int64(10), int64(100))))
-					r.AddTypeConfig("Int64Ptr", randomise.WithProvider(randomise.Between(int64Ptr(10), int64Ptr(100))))
-					endMockColTime := mockColTime.AddDate(0, 0, 10)
-					r.AddTypeConfig("Time", randomise.WithProvider(randomise.Between(mockColTime, endMockColTime)))
-					r.AddTypeConfig("TimePtr", randomise.WithProvider(randomise.Between(&mockColTime, &endMockColTime)))
-					endMockColCustomIntType := mockColCustomIntType + 10
-					r.AddTypeConfig("CustomInt", randomise.WithProvider(randomise.Between(mockColCustomIntType, endMockColCustomIntType)))
-					r.AddTypeConfig("CustomPtrInt", randomise.WithProvider(randomise.Between(&mockColCustomIntType, &endMockColCustomIntType)))
-					endMockColCustomTimeType := CustomTimeType(endMockColTime)
-					r.AddTypeConfig("CustomTime", randomise.WithProvider(randomise.Between(mockColCustomTimeType, endMockColCustomTimeType)))
-					r.AddTypeConfig("CustomPtrTime", randomise.WithProvider(randomise.Between(&mockColCustomTimeType, &endMockColCustomTimeType)))
+					r.AddTypeConfig("Field", randomise.WithStringLength(10))
 					Expect(r.Struct(&t)).To(Succeed())
+					Expect(len(t.Field)).To(BeNumerically("==", 10))
+					Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.StringLengthDefault))
 				})
 			})
-		})
 
-		Describe("When string length is provided", func() {
-			type Test struct {
-				Field        string
-				DefaultField string
-			}
-
-			It("should set string length different to default", func() {
-				t := Test{}
-				r.AddTypeConfig("Field", randomise.WithStringLength(10))
-				Expect(r.Struct(&t)).To(Succeed())
-				Expect(len(t.Field)).To(BeNumerically("==", 10))
-				Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.StringLengthDefault))
-			})
-		})
-
-		Describe("When slice length is provided", func() {
-			type Test struct {
-				Field        []string
-				DefaultField []string
-			}
-
-			It("should set slice length different to default", func() {
-				t := Test{}
-				r.AddTypeConfig("Field", randomise.WithSliceLength(10))
-				Expect(r.Struct(&t)).To(Succeed())
-				Expect(len(t.Field)).To(BeNumerically("==", 10))
-				Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.SliceLengthDefault))
-			})
-		})
-
-		Describe("When map length is provided", func() {
-			type Test struct {
-				Field map[string]int
-				//DefaultField map[string]string
-			}
-
-			It("should set map length different to default", func() {
-				t := Test{}
-				r.AddTypeConfig("Field", randomise.WithMapLength(10))
-				Expect(r.Struct(&t)).To(Succeed())
-				Expect(len(t.Field)).To(BeNumerically("==", 10))
-				//Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.MapLengthDefault))
-			})
-		})
-
-		Describe("When map key length is provided", func() {
-			type Test struct {
-				Field        map[string]string
-				DefaultField map[string]string
-			}
-
-			It("should set map key different to default", func() {
-				t := Test{}
-				r.AddTypeConfig("Field", randomise.WithMapKeyLength(10))
-				Expect(r.Struct(&t)).To(Succeed())
-				for k := range t.Field {
-					Expect(len(k)).To(BeNumerically("==", 10))
+			Describe("When slice length is provided", func() {
+				type Test struct {
+					Field        []string
+					DefaultField []string
 				}
-				for k := range t.DefaultField {
-					Expect(len(k)).To(BeNumerically("==", randomise.MapKeyLengthDefault))
+
+				It("should set slice length different to default", func() {
+					t := Test{}
+					r.AddTypeConfig("Field", randomise.WithSliceLength(10))
+					Expect(r.Struct(&t)).To(Succeed())
+					Expect(len(t.Field)).To(BeNumerically("==", 10))
+					Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.SliceLengthDefault))
+				})
+			})
+
+			Describe("When map length is provided", func() {
+				type Test struct {
+					Field map[string]int
+					//DefaultField map[string]string
 				}
+
+				It("should set map length different to default", func() {
+					t := Test{}
+					r.AddTypeConfig("Field", randomise.WithMapLength(10))
+					Expect(r.Struct(&t)).To(Succeed())
+					Expect(len(t.Field)).To(BeNumerically("==", 10))
+					//Expect(len(t.DefaultField)).To(BeNumerically("==", randomise.MapLengthDefault))
+				})
+			})
+
+			Describe("When map key length is provided", func() {
+				type Test struct {
+					Field        map[string]string
+					DefaultField map[string]string
+				}
+
+				It("should set map key different to default", func() {
+					t := Test{}
+					r.AddTypeConfig("Field", randomise.WithMapKeyLength(10))
+					Expect(r.Struct(&t)).To(Succeed())
+					for k := range t.Field {
+						Expect(len(k)).To(BeNumerically("==", 10))
+					}
+					for k := range t.DefaultField {
+						Expect(len(k)).To(BeNumerically("==", randomise.MapKeyLengthDefault))
+					}
+				})
 			})
 		})
 	})
+
+	Describe("String", func() {
+		Context("when randomising string", func() {
+			It("should return random string", func() {
+				var actual string
+				r.String(&actual)
+				Expect(actual).To(Equal("LWPAe"))
+			})
+		})
+	})
+
 })
 
 func timePtr(v time.Time) *time.Time {
