@@ -5,7 +5,7 @@ import (
 	"time"
 
 	randomise "github.com/amwill04/randomiser"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
