@@ -890,19 +890,15 @@ var _ = Describe("Randomise", func() {
 	Describe("String", func() {
 		Context("when randomising string", func() {
 			It("should return random string", func() {
-				var actual string
-				r.String(&actual)
-				Expect(actual).To(Equal("LWPAe"))
+				Expect(r.String(5)).To(Equal("LWPAe"))
 			})
 		})
 	})
 
 	Describe("int", func() {
-		Context("when randomising string", func() {
-			It("should return random string", func() {
-				var actual int
-				r.Int(&actual)
-				Expect(actual).To(Equal(8702378986455029718))
+		Context("when randomising int", func() {
+			It("should return random int", func() {
+				Expect(r.Int()).To(Equal(8702378986455029718))
 			})
 		})
 	})

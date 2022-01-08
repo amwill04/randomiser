@@ -151,12 +151,12 @@ func (r *Random) Struct(dst interface{}) error {
 	return nil
 }
 
-func (r *Random) String(dst *string) {
-	*dst = r.randomString(r.currentConfig.StringLength)
+func (r *Random) String(stringLength int) string {
+	return r.randomString(stringLength)
 }
 
-func (r *Random) Int(dst *int) {
-	*dst = r.randomInt()
+func (r *Random) Int() int {
+	return r.randomInt()
 }
 
 func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *int) error {
