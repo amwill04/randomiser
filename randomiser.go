@@ -159,6 +159,10 @@ func (r *Random) Int() int {
 	return r.randomInt()
 }
 
+func (r *Random) Time() time.Time {
+	return r.randomTime()
+}
+
 func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *int) error {
 	if !value.CanInterface() {
 		return nil

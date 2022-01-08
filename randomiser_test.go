@@ -903,6 +903,14 @@ var _ = Describe("Randomise", func() {
 		})
 	})
 
+	Describe("time", func() {
+		Context("when randomising time", func() {
+			It("should return random time", func() {
+				Expect(r.Time()).To(Equal(time.Date(2053, 2, 8, 15, 6, 59, 0, time.UTC)))
+			})
+		})
+	})
+
 })
 
 func timePtr(v time.Time) *time.Time {
