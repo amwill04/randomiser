@@ -155,6 +155,10 @@ func (r *Random) String(dst *string) {
 	*dst = r.randomString(r.currentConfig.StringLength)
 }
 
+func (r *Random) Int(dst *int) {
+	*dst = r.randomInt()
+}
+
 func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *int) error {
 	if !value.CanInterface() {
 		return nil
