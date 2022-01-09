@@ -890,7 +890,7 @@ var _ = Describe("Randomise", func() {
 	Describe("String", func() {
 		Context("when randomising string", func() {
 			It("should return random string", func() {
-				Expect(r.String(5)).To(Equal("LWPAe"))
+				Expect(randomise.String(5)).To(Equal("LWPAe"))
 			})
 		})
 	})
@@ -898,7 +898,7 @@ var _ = Describe("Randomise", func() {
 	Describe("int", func() {
 		Context("when randomising int", func() {
 			It("should return random int", func() {
-				Expect(r.Int()).To(Equal(8702378986455029718))
+				Expect(randomise.Int()).To(Equal(8702378986455029718))
 			})
 		})
 	})
@@ -906,7 +906,7 @@ var _ = Describe("Randomise", func() {
 	Describe("time", func() {
 		Context("when randomising time", func() {
 			It("should return random time", func() {
-				Expect(r.Time()).To(Equal(time.Date(2053, 2, 8, 15, 6, 59, 0, time.UTC)))
+				Expect(randomise.Time()).To(Equal(time.Date(2053, 2, 8, 15, 6, 59, 0, time.UTC)))
 			})
 		})
 	})

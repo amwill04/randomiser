@@ -101,6 +101,18 @@ func WithProvider(provider Provider) ConfigOption {
 	}
 }
 
+func String(stringLength int) string {
+	return randomString(stringLength)
+}
+
+func Int() int {
+	return randomInt()
+}
+
+func Time() time.Time {
+	return randomTime()
+}
+
 func (r *Random) AddTypeConfig(name string, options ...ConfigOption) {
 	baseConfig := Config{
 		Provider:     nil,
@@ -149,18 +161,6 @@ func (r *Random) Struct(dst interface{}) error {
 		}
 	}
 	return nil
-}
-
-func (r *Random) String(stringLength int) string {
-	return r.randomString(stringLength)
-}
-
-func (r *Random) Int() int {
-	return r.randomInt()
-}
-
-func (r *Random) Time() time.Time {
-	return r.randomTime()
 }
 
 func (r Random) randomiseField(value reflect.Value, typ reflect.Type, length *int) error {
@@ -354,12 +354,12 @@ func (r Random) randomiseInt64(value reflect.Value, typ reflect.Type) {
 	value.Set(newValue)
 }
 
-func (r Random) randomInt() int {
+func randomInt() int {
 	return rand.Int()
 }
 
 func (r Random) randomiseInt(value reflect.Value, typ reflect.Type) {
-	v := r.randomInt()
+	v := randomInt()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -514,7 +514,7 @@ const (
 	letterIdxMax  = 63 / letterIdxBits
 )
 
-func (r Random) randomString(length int) string {
+func randomString(length int) string {
 	b := make([]byte, length)
 	for i, cache, remain := length-1, rand.Int63(), letterIdxMax; i >= 0; {
 		if remain == 0 {
@@ -531,7 +531,7 @@ func (r Random) randomString(length int) string {
 }
 
 func (r Random) randomiseString(value reflect.Value, typ reflect.Type, length int) {
-	v := r.randomString(length)
+	v := randomString(length)
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -543,7 +543,7 @@ func (r Random) randomiseString(value reflect.Value, typ reflect.Type, length in
 	value.Set(newValue)
 }
 
-func (r Random) randomTime() time.Time {
+func randomTime() time.Time {
 	return time.Unix(int64(rand.Uint32()), 0).UTC()
 }
 
@@ -553,7 +553,7 @@ func (r Random) randomiseTime(value reflect.Value, typ reflect.Type) (err error)
 			err = internalNotTime{}
 		}
 	}()
-	v := r.randomTime()
+	v := randomTime()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
