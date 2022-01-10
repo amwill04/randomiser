@@ -887,30 +887,33 @@ var _ = Describe("Randomise", func() {
 		})
 	})
 
-	Describe("String", func() {
+	Describe("utilities", func() {
+
 		Context("when randomising string", func() {
 			It("should return random string", func() {
 				Expect(randomise.String(5)).To(Equal("LWPAe"))
 			})
 		})
-	})
 
-	Describe("int", func() {
 		Context("when randomising int", func() {
 			It("should return random int", func() {
 				Expect(randomise.Int()).To(Equal(8702378986455029718))
 			})
 		})
-	})
 
-	Describe("time", func() {
-		Context("when randomising time", func() {
-			It("should return random time", func() {
-				Expect(randomise.Time()).To(Equal(time.Date(2053, 2, 8, 15, 6, 59, 0, time.UTC)))
+		Context("when randomising int", func() {
+			It("should return random int", func() {
+				Expect(randomise.Int8()).To(BeEquivalentTo(122))
 			})
 		})
-	})
 
+		Context("when randomising time", func() {
+			It("should return random time", func() {
+				Expect(randomise.Time()).To(Equal(time.Date(2017, time.August, 31, 3, 30, 44, 0, time.UTC)))
+			})
+		})
+
+	})
 })
 
 func timePtr(v time.Time) *time.Time {

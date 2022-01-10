@@ -109,6 +109,10 @@ func Int() int {
 	return randomInt()
 }
 
+func Int8() int8 {
+	return randomInt8()
+}
+
 func Time() time.Time {
 	return randomTime()
 }
@@ -286,12 +290,12 @@ const (
 	uint16Mask = 1<<16 - 1
 )
 
-func (r Random) randomInt8() int8 {
+func randomInt8() int8 {
 	return int8(rand.Int63() & int8Mask)
 }
 
 func (r Random) randomiseInt8(value reflect.Value, typ reflect.Type) {
-	v := r.randomInt8()
+	v := randomInt8()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
