@@ -39,14 +39,18 @@ func OneOf(values ...interface{}) Provider {
 
 func As(v interface{}) Provider {
 	return func(value reflect.Value, typ reflect.Type, fieldName string) error {
+		if v == nil {
+			return nil
+		}
 		baseType := typ
+		setValue := reflect.ValueOf(v)
 		var isPtr bool
 		if baseType.Kind() == reflect.Ptr {
 			isPtr = true
 			baseType = baseType.Elem()
+			setValue = setValue.Elem()
 		}
 		newValue := reflect.New(baseType)
-		setValue := reflect.ValueOf(v)
 		if setValue.Type() != baseType {
 			return MalformedProviderType{
 				typeRequired: typ,
