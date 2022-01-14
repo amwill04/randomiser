@@ -48,6 +48,8 @@ func As(v interface{}) Provider {
 		if baseType.Kind() == reflect.Ptr {
 			isPtr = true
 			baseType = baseType.Elem()
+		}
+		if setValue.Kind() == reflect.Ptr {
 			setValue = setValue.Elem()
 		}
 		newValue := reflect.New(baseType)
