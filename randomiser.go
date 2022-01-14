@@ -113,6 +113,14 @@ func Int8() int8 {
 	return randomInt8()
 }
 
+func Float64() float64 {
+	return randomFloat64()
+}
+
+func Float32() float32 {
+	return randomFloat32()
+}
+
 func Time() time.Time {
 	return randomTime()
 }
@@ -375,12 +383,12 @@ func (r Random) randomiseInt(value reflect.Value, typ reflect.Type) {
 	value.Set(newValue)
 }
 
-func (r Random) randomFloat32() float32 {
+func randomFloat32() float32 {
 	return rand.Float32()
 }
 
 func (r Random) randomiseFloat32(value reflect.Value, typ reflect.Type) {
-	v := r.randomFloat32()
+	v := randomFloat32()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -392,12 +400,12 @@ func (r Random) randomiseFloat32(value reflect.Value, typ reflect.Type) {
 	value.Set(newValue)
 }
 
-func (r Random) randomFloat64() float64 {
+func randomFloat64() float64 {
 	return rand.Float64()
 }
 
 func (r Random) randomiseFloat64(value reflect.Value, typ reflect.Type) {
-	v := r.randomFloat64()
+	v := randomFloat64()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())

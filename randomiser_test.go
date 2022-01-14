@@ -907,9 +907,21 @@ var _ = Describe("Randomise", func() {
 			})
 		})
 
+		Context("when randomising float32", func() {
+			It("should return random float32", func() {
+				Expect(randomise.Float32()).To(Equal(float32(0.3502122759819031)))
+			})
+		})
+
+		Context("when randomising float64", func() {
+			It("should return random float64", func() {
+				Expect(randomise.Float64()).To(Equal(0.6172773912570155))
+			})
+		})
+
 		Context("when randomising time", func() {
 			It("should return random time", func() {
-				Expect(randomise.Time()).To(Equal(time.Date(2017, time.August, 31, 3, 30, 44, 0, time.UTC)))
+				Expect(randomise.Time()).To(Equal(time.Date(2104, time.October, 25, 10, 43, 55, 0, time.UTC)))
 			})
 		})
 
