@@ -660,15 +660,6 @@ var _ = Describe("Randomise", func() {
 					Field string
 				}
 
-				Context("when is declared with incorrect type", func() {
-					It("it should return MalformedProviderType", func() {
-						t := Test{}
-						r.AddTypeConfig("Field", randomise.WithProvider(randomise.As(100)))
-						err := r.Struct(&t)
-						Expect(err).To(BeAssignableToTypeOf(randomise.MalformedProviderType{}))
-					})
-				})
-
 				Context("when is declared with value rather than pointer", func() {
 					type TestPtr struct {
 						Field *string

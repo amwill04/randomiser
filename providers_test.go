@@ -7,6 +7,8 @@ import (
 	randomise "github.com/amwill04/randomiser"
 )
 
+type customInt int
+
 func TestAs(t *testing.T) {
 	tests := map[string]struct {
 		expected interface{}
@@ -19,6 +21,9 @@ func TestAs(t *testing.T) {
 		},
 		"pointer": {
 			expected: stringPtr("string pointer"),
+		},
+		"custom": {
+			expected: customInt(100),
 		},
 	}
 
@@ -42,4 +47,25 @@ func TestAs(t *testing.T) {
 
 		})
 	}
+}
+
+func TestAs_CustomType(t *testing.T) {
+	t.Log("\tTest: When custom type")
+
+	expected := customInt(100)
+
+	as := randomise.As(expected)
+
+	actual := reflect.New(reflect.TypeOf(0)).Elem()
+
+	err := as(actual, reflect.TypeOf(0), "Int")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if int64(expected) != actual.Int() {
+		t.Errorf("actual: %v does not equal expected: %v", actual, expected)
+	}
+
 }

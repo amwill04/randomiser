@@ -20,13 +20,14 @@ func OneOf(values ...interface{}) Provider {
 		newValue := reflect.New(baseType)
 		v := values[rand.Int63n(int64(len(values)))]
 		setValue := reflect.ValueOf(v)
-		if setValue.Type() != baseType {
+		if !setValue.CanConvert(newValue.Elem().Type()) {
 			return MalformedProviderType{
 				typeRequired: typ,
 				value:        v,
 				fieldName:    fieldName,
 			}
 		}
+		setValue = setValue.Convert(newValue.Elem().Type())
 		newValue.Elem().Set(setValue)
 		if isPtr {
 			value.Set(newValue)
@@ -53,13 +54,14 @@ func As(v interface{}) Provider {
 			setValue = setValue.Elem()
 		}
 		newValue := reflect.New(baseType)
-		if setValue.Type() != baseType {
+		if !setValue.CanConvert(newValue.Elem().Type()) {
 			return MalformedProviderType{
 				typeRequired: typ,
 				value:        v,
 				fieldName:    fieldName,
 			}
 		}
+		setValue = setValue.Convert(newValue.Elem().Type())
 		newValue.Elem().Set(setValue)
 		if isPtr {
 			value.Set(newValue)
