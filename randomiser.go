@@ -21,9 +21,10 @@ const (
 )
 
 func NewRandomise(seed int64) Random {
-	rand.Seed(seed)
+	src := rand.NewSource(seed)
 	configs := make(map[string]Config)
 	defaultConfig := Config{
+		rand:         rand.New(src),
 		Provider:     nil,
 		MapKeyLength: MapKeyLengthDefault,
 		StringLength: StringLengthDefault,
@@ -39,6 +40,7 @@ func NewRandomise(seed int64) Random {
 }
 
 type Config struct {
+	rand         *rand.Rand
 	Provider     Provider
 	MapKeyLength int
 	StringLength int
@@ -105,24 +107,49 @@ func String(stringLength int) string {
 	return randomString(stringLength)
 }
 
+func IntWithSeed(seed int64) int {
+	r := NewRandomise(seed)
+	return r.randomInt()
+}
+
 func Int() int {
-	return randomInt()
+	return IntWithSeed(time.Now().Unix())
+}
+
+func Int8WithSeed(seed int64) int8 {
+	r := NewRandomise(seed)
+	return r.randomInt8()
 }
 
 func Int8() int8 {
-	return randomInt8()
+	return Int8WithSeed(time.Now().Unix())
+}
+
+func Float64WithSeed(seed int64) float64 {
+	r := NewRandomise(seed)
+	return r.randomFloat64()
 }
 
 func Float64() float64 {
-	return randomFloat64()
+	return Float64WithSeed(time.Now().Unix())
+}
+
+func Float32WithSeed(seed int64) float32 {
+	r := NewRandomise(seed)
+	return r.randomFloat32()
 }
 
 func Float32() float32 {
-	return randomFloat32()
+	return Float32WithSeed(time.Now().Unix())
+}
+
+func TimeWithSeed(seed int64) time.Time {
+	r := NewRandomise(seed)
+	return r.randomTime()
 }
 
 func Time() time.Time {
-	return randomTime()
+	return TimeWithSeed(time.Now().Unix())
 }
 
 func (r *Random) AddTypeConfig(name string, options ...ConfigOption) {
@@ -298,12 +325,12 @@ const (
 	uint16Mask = 1<<16 - 1
 )
 
-func randomInt8() int8 {
-	return int8(rand.Int63() & int8Mask)
+func (r Random) randomInt8() int8 {
+	return int8(r.defaultConfig.rand.Int63() & int8Mask)
 }
 
 func (r Random) randomiseInt8(value reflect.Value, typ reflect.Type) {
-	v := randomInt8()
+	v := r.randomInt8()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -366,12 +393,12 @@ func (r Random) randomiseInt64(value reflect.Value, typ reflect.Type) {
 	value.Set(newValue)
 }
 
-func randomInt() int {
-	return rand.Int()
+func (r Random) randomInt() int {
+	return r.defaultConfig.rand.Int()
 }
 
 func (r Random) randomiseInt(value reflect.Value, typ reflect.Type) {
-	v := randomInt()
+	v := r.randomInt()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -383,12 +410,12 @@ func (r Random) randomiseInt(value reflect.Value, typ reflect.Type) {
 	value.Set(newValue)
 }
 
-func randomFloat32() float32 {
-	return rand.Float32()
+func (r Random) randomFloat32() float32 {
+	return r.defaultConfig.rand.Float32()
 }
 
 func (r Random) randomiseFloat32(value reflect.Value, typ reflect.Type) {
-	v := randomFloat32()
+	v := r.randomFloat32()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -400,12 +427,12 @@ func (r Random) randomiseFloat32(value reflect.Value, typ reflect.Type) {
 	value.Set(newValue)
 }
 
-func randomFloat64() float64 {
-	return rand.Float64()
+func (r Random) randomFloat64() float64 {
+	return r.defaultConfig.rand.Float64()
 }
 
 func (r Random) randomiseFloat64(value reflect.Value, typ reflect.Type) {
-	v := randomFloat64()
+	v := r.randomFloat64()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
@@ -555,8 +582,8 @@ func (r Random) randomiseString(value reflect.Value, typ reflect.Type, length in
 	value.Set(newValue)
 }
 
-func randomTime() time.Time {
-	return time.Unix(int64(rand.Uint32()), 0).UTC()
+func (r Random) randomTime() time.Time {
+	return time.Unix(int64(r.defaultConfig.rand.Uint32()), 0).UTC()
 }
 
 func (r Random) randomiseTime(value reflect.Value, typ reflect.Type) (err error) {
@@ -565,7 +592,7 @@ func (r Random) randomiseTime(value reflect.Value, typ reflect.Type) (err error)
 			err = internalNotTime{}
 		}
 	}()
-	v := randomTime()
+	v := r.randomTime()
 	var newValue reflect.Value
 	if typ.Kind() == reflect.Ptr {
 		newType := reflect.New(typ.Elem())
