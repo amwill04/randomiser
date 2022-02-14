@@ -352,7 +352,7 @@ func (r Random) randomiseInt8(value reflect.Value, typ reflect.Type) {
 }
 
 func (r Random) randomInt16() int16 {
-	return int16(rand.Int63() & int16Mask)
+	return int16(r.defaultConfig.rand.Int63() & int16Mask)
 }
 
 func (r Random) randomiseInt16(value reflect.Value, typ reflect.Type) {
