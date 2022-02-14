@@ -125,6 +125,15 @@ func Int8() int8 {
 	return Int8WithSeed(time.Now().Unix())
 }
 
+func Int16WithSeed(seed int64) int16 {
+	r := NewRandomise(seed)
+	return r.randomInt16()
+}
+
+func Int16() int16 {
+	return Int16WithSeed(time.Now().Unix())
+}
+
 func Float64WithSeed(seed int64) float64 {
 	r := NewRandomise(seed)
 	return r.randomFloat64()
