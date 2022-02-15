@@ -161,6 +161,19 @@ func Time() time.Time {
 	return TimeWithSeed(time.Now().Unix())
 }
 
+func TimeBetweenWithSeed(seed int64, start time.Time, end time.Time) time.Time {
+	t := reflect.ValueOf(&time.Time{}).Elem()
+	provider := Between(start, end)
+	src := rand.NewSource(seed)
+	r := rand.New(src)
+	_ = provider(r, t, t.Type(), "timeBetween")
+	return t.Interface().(time.Time)
+}
+
+func TimeBetween(start time.Time, end time.Time) time.Time {
+	return TimeBetweenWithSeed(time.Now().Unix(), start, end)
+}
+
 func (r *Random) AddTypeConfig(name string, options ...ConfigOption) {
 	baseConfig := Config{
 		Provider:     nil,
@@ -197,7 +210,7 @@ func (r *Random) Struct(dst interface{}) error {
 		r.currentConfig = r.defaultConfig
 		if config, ok := r.configs[fieldTyp.Name]; ok {
 			if config.Provider != nil {
-				if err := config.Provider(fieldVal, fieldTyp.Type, fieldTyp.Name); err != nil {
+				if err := config.Provider(config.rand, fieldVal, fieldTyp.Type, fieldTyp.Name); err != nil {
 					return err
 				}
 				continue
