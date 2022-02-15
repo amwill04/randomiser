@@ -1,6 +1,7 @@
 package randomiser_test
 
 import (
+	"math/rand"
 	"reflect"
 	"testing"
 
@@ -35,7 +36,10 @@ func TestAs(t *testing.T) {
 
 			actual := reflect.New(reflect.TypeOf(tt.expected)).Elem()
 
-			err := as(actual, reflect.TypeOf(tt.expected), name)
+			src := rand.NewSource(10)
+			r := rand.New(src)
+
+			err := as(r, actual, reflect.TypeOf(tt.expected), name)
 
 			if err != nil {
 				t.Error(err)
@@ -58,7 +62,10 @@ func TestAs_CustomType(t *testing.T) {
 
 	actual := reflect.New(reflect.TypeOf(0)).Elem()
 
-	err := as(actual, reflect.TypeOf(0), "Int")
+	src := rand.NewSource(10)
+	r := rand.New(src)
+
+	err := as(r, actual, reflect.TypeOf(0), "Int")
 
 	if err != nil {
 		t.Error(err)

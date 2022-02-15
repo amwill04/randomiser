@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-type Provider func(reflect.Value, reflect.Type, string) error
+type Provider func(*rand.Rand, reflect.Value, reflect.Type, string) error
 
 func OneOf(values ...interface{}) Provider {
-	return func(value reflect.Value, typ reflect.Type, fieldName string) error {
+	return func(r *rand.Rand, value reflect.Value, typ reflect.Type, fieldName string) error {
 		baseType := typ
 		var isPtr bool
 		if baseType.Kind() == reflect.Ptr {
@@ -18,7 +18,7 @@ func OneOf(values ...interface{}) Provider {
 			baseType = baseType.Elem()
 		}
 		newValue := reflect.New(baseType)
-		v := values[rand.Int63n(int64(len(values)))]
+		v := values[r.Int63n(int64(len(values)))]
 		setValue := reflect.ValueOf(v)
 		if !setValue.CanConvert(newValue.Elem().Type()) {
 			return MalformedProviderType{
@@ -39,7 +39,7 @@ func OneOf(values ...interface{}) Provider {
 }
 
 func As(v interface{}) Provider {
-	return func(value reflect.Value, typ reflect.Type, fieldName string) error {
+	return func(_ *rand.Rand, value reflect.Value, typ reflect.Type, fieldName string) error {
 		if v == nil {
 			return nil
 		}
@@ -77,7 +77,7 @@ var (
 )
 
 func Between(start interface{}, end interface{}) Provider {
-	return func(value reflect.Value, typ reflect.Type, fieldName string) error {
+	return func(r *rand.Rand, value reflect.Value, typ reflect.Type, fieldName string) error {
 		vStart := reflect.ValueOf(start)
 		if vStart.Type() != typ {
 			return MalformedProviderType{
@@ -112,7 +112,7 @@ func Between(start interface{}, end interface{}) Provider {
 				}
 			}
 			span := vEnd.Int() - vStart.Int()
-			setValue = reflect.ValueOf(rand.Int63n(span) + vStart.Int()).Convert(t)
+			setValue = reflect.ValueOf(r.Int63n(span) + vStart.Int()).Convert(t)
 		default:
 			isTime := typ.ConvertibleTo(reflect.TypeOf(time.Time{})) || typ.ConvertibleTo(reflect.TypeOf(&time.Time{}))
 			if !isTime {
@@ -129,7 +129,7 @@ func Between(start interface{}, end interface{}) Provider {
 				}
 			}
 			span := timeEnd.Unix() - timeStart.Unix()
-			newTime := time.Unix(rand.Int63n(span)+timeStart.Unix(), 0).UTC()
+			newTime := time.Unix(r.Int63n(span)+timeStart.Unix(), 0).UTC()
 			setValue = reflect.ValueOf(newTime).Convert(t)
 		}
 		newValue.Elem().Set(setValue)
