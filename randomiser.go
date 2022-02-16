@@ -113,7 +113,7 @@ func IntWithSeed(seed int64) int {
 }
 
 func Int() int {
-	return IntWithSeed(time.Now().Unix())
+	return IntWithSeed(time.Now().UnixNano())
 }
 
 func Int8WithSeed(seed int64) int8 {
@@ -122,7 +122,7 @@ func Int8WithSeed(seed int64) int8 {
 }
 
 func Int8() int8 {
-	return Int8WithSeed(time.Now().Unix())
+	return Int8WithSeed(time.Now().UnixNano())
 }
 
 func Int16WithSeed(seed int64) int16 {
@@ -131,7 +131,7 @@ func Int16WithSeed(seed int64) int16 {
 }
 
 func Int16() int16 {
-	return Int16WithSeed(time.Now().Unix())
+	return Int16WithSeed(time.Now().UnixNano())
 }
 
 func Float64WithSeed(seed int64) float64 {
@@ -140,7 +140,7 @@ func Float64WithSeed(seed int64) float64 {
 }
 
 func Float64() float64 {
-	return Float64WithSeed(time.Now().Unix())
+	return Float64WithSeed(time.Now().UnixNano())
 }
 
 func Float32WithSeed(seed int64) float32 {
@@ -149,7 +149,7 @@ func Float32WithSeed(seed int64) float32 {
 }
 
 func Float32() float32 {
-	return Float32WithSeed(time.Now().Unix())
+	return Float32WithSeed(time.Now().UnixNano())
 }
 
 func TimeWithSeed(seed int64) time.Time {
@@ -158,7 +158,7 @@ func TimeWithSeed(seed int64) time.Time {
 }
 
 func Time() time.Time {
-	return TimeWithSeed(time.Now().Unix())
+	return TimeWithSeed(time.Now().UnixNano())
 }
 
 func TimeBetweenWithSeed(seed int64, start time.Time, end time.Time) time.Time {
@@ -171,7 +171,7 @@ func TimeBetweenWithSeed(seed int64, start time.Time, end time.Time) time.Time {
 }
 
 func TimeBetween(start time.Time, end time.Time) time.Time {
-	return TimeBetweenWithSeed(time.Now().Unix(), start, end)
+	return TimeBetweenWithSeed(time.Now().UnixNano(), start, end)
 }
 
 func (r *Random) AddTypeConfig(name string, options ...ConfigOption) {
