@@ -19,6 +19,9 @@ func OneOf(values ...interface{}) Provider {
 		}
 		newValue := reflect.New(baseType)
 		v := values[r.Int63n(int64(len(values)))]
+		if v == nil {
+			return nil
+		}
 		setValue := reflect.ValueOf(v)
 		if !setValue.CanConvert(newValue.Elem().Type()) {
 			return MalformedProviderType{
